@@ -10,7 +10,16 @@ import org.apache.poi.xslf.usermodel.XSLFTextRun;
 class PptParser {
 	
 	static Optional<PptVariable> parse(String text) {
-		// TODO à implémenter
+		if(text.startsWith("$/") && text.endsWith("/")) {
+			int indexStartParameter = text.indexOf(':');
+			if(indexStartParameter < 0) {
+				return Optional.of(PptVariable.of(text.substring(2, text.length() - 1), null));
+			}
+			return Optional.of(PptVariable.of(
+				text.substring(2, indexStartParameter),
+				text.substring(indexStartParameter + 2, text.length() - 2)
+			));
+		}
 		return Optional.empty();
 	}
 	
