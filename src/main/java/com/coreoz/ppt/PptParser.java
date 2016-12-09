@@ -92,7 +92,7 @@ class PptParser {
 				StringBuilder textPartReplaced = new StringBuilder(partContent.substring(0, indexOfStartVariable));
 				textPartReplaced.append(replacedText.get());
 				if(textParts.size() == 1) {
-					textPartReplaced.append(partContent.substring(indexOfEndVariable));
+					textPartReplaced.append(partContent.substring(indexOfEndVariable + 1));
 				}
 				textPart.setText(textPartReplaced.toString());
 			} else if(i < (textParts.size() - 1)) {
