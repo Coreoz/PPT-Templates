@@ -163,6 +163,10 @@ public class PptTemplates {
 			for (XSLFTextRun textRun : paragraph.getTextRuns()) {
 				Optional<PptVariable> parsedHyperlinkVariale = parseHyperlinkVariale(textRun.getHyperlink());
 				
+				parsedHyperlinkVariale
+					.flatMap(variable -> mapper.styleText(variable.getName()))
+					.ifPresent(styler -> styler.accept(parsedHyperlinkVariale.get().getArg1(), textRun));
+				
 				if(shouldHide(parsedHyperlinkVariale, mapper)) {
 					textRun.setText("");	
 				} else if(parsedHyperlinkVariale.isPresent()) {

@@ -1,5 +1,6 @@
 package com.coreoz.ppt;
 
+import java.awt.Color;
 import java.io.FileOutputStream;
 
 import org.apache.poi.util.IOUtils;
@@ -17,7 +18,11 @@ public class PptTemplatesTest {
 			.text("var1", "Content replaced")
 			.text("var3", "Header cell replaced")
 			.text("var4", "Content cell replaced")
-			.imageJpg("image", IOUtils.toByteArray(PptTemplatesTest.class.getResourceAsStream("/images/replacedImage.jpg")));
+			.imageJpg("image", IOUtils.toByteArray(PptTemplatesTest.class.getResourceAsStream("/images/replacedImage.jpg")))
+			.styleText("style", textRun -> {
+				textRun.setBold(true);
+				textRun.setFontColor(Color.GREEN);
+			});
 		
 		XMLSlideShow transformed = PptTemplates.process(PptTemplatesTest.class.getResourceAsStream("/full_content.pptx"), mapper);
 		
