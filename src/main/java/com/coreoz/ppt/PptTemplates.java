@@ -22,7 +22,7 @@ import org.apache.poi.xslf.usermodel.XSLFTextShape;
 import lombok.SneakyThrows;
 
 /**
- * Variable format in the PPT: $/variableName/
+ * Variable format in the PPT: $/variableName:'argument'/
  */
 public class PptTemplates {
 
@@ -108,13 +108,23 @@ public class PptTemplates {
 	}
 
 	private void processTextParagraphs(List<XSLFTextParagraph> paragraphs, PptMapper mapper) {
-		for(XSLFTextParagraph paragraph : paragraphs) {
-			PptParser.replaceTextVariable(paragraph, mapper);
+		for (Iterator<XSLFTextParagraph> iterator = paragraphs.iterator(); iterator.hasNext();) {
+			XSLFTextParagraph paragraph = iterator.next();
+			
+			if(shouldHide(PptParser.parse(paragraph.getText()), mapper)) {
+				iterator.remove();
+			} else {
+				PptParser.replaceTextVariable(paragraph, mapper);
+			}
 		}
 	}
 	
 	private boolean shouldHide(SimpleShape<?, ?> simpleShape, PptMapper mapper) {
-		return parseHyperlinkVariale(simpleShape)
+		return shouldHide(parseHyperlinkVariale(simpleShape), mapper);
+	}
+	
+	private boolean shouldHide(Optional<PptVariable> variable, PptMapper mapper) {
+		return variable
 			.flatMap(shapeVariable ->
 				mapper.hideMapping(shapeVariable.getName(), shapeVariable.getArg1())
 			)
