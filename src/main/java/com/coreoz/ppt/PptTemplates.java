@@ -9,6 +9,8 @@ import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.sl.usermodel.Hyperlink;
 import org.apache.poi.sl.usermodel.SimpleShape;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
+import org.apache.poi.xslf.usermodel.XSLFAutoShape;
+import org.apache.poi.xslf.usermodel.XSLFPictureShape;
 import org.apache.poi.xslf.usermodel.XSLFShape;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
 import org.apache.poi.xslf.usermodel.XSLFTable;
@@ -37,7 +39,7 @@ public class PptTemplates {
 		for(XSLFSlide slide : ppt.getSlides()) {
 			Iterator<XSLFShape> shapeIterator = slide.getShapes().iterator();
 			while(shapeIterator.hasNext()) {
-				if(processShape(shapeIterator.next(), mapper)) {
+				if(processShape(ppt, slide, shapeIterator.next(), mapper)) {
 					shapeIterator.remove();
 				}
 			}
@@ -50,13 +52,38 @@ public class PptTemplates {
 	 * Handles shape modification
 	 * @return true is the shape should be removed
 	 */
-	private boolean processShape(XSLFShape shape, PptMapper mapper) {
+	private boolean processShape(XMLSlideShow ppt, XSLFSlide slide, XSLFShape shape, PptMapper mapper) {
 		if(shape instanceof XSLFTextShape) {
 			return processTextShape((XSLFTextShape) shape, mapper);
 		}
 		if(shape instanceof XSLFTable) {
 			return processTableShape((XSLFTable) shape, mapper);
 		}
+		if(shape instanceof XSLFAutoShape) {
+			return processGeometryShape((XSLFAutoShape) shape, mapper);
+		}
+		if(shape instanceof XSLFPictureShape) {
+			return processImageShape(ppt, slide, (XSLFPictureShape) shape, mapper);
+		}
+		return false;
+	}
+	
+	private boolean processImageShape(XMLSlideShow ppt, XSLFSlide slide, XSLFPictureShape imageShape, PptMapper mapper) {
+		if(shouldHide(imageShape, mapper)) {
+			return true;
+		}
+		
+		
+		return false;
+	}
+
+	private boolean processGeometryShape(XSLFAutoShape geometryShape, PptMapper mapper) {
+		if(shouldHide(geometryShape, mapper)) {
+			return true;
+		}
+		
+		processTextParagraphs(geometryShape.getTextParagraphs(), mapper);
+		
 		return false;
 	}
 	
