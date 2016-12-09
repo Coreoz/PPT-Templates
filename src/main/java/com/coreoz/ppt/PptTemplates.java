@@ -16,6 +16,9 @@ import org.apache.poi.xslf.usermodel.XSLFTextShape;
 
 import lombok.SneakyThrows;
 
+/**
+ * Variable format in the PPT: $/variableName/
+ */
 public class PptTemplates {
 
 	@SneakyThrows
@@ -61,8 +64,10 @@ public class PptTemplates {
 		return false;
 	}
 
-	private void processTextParagraphs(List<XSLFTextParagraph> paragraph, PptMapper mapper) {
-		// TODO continuer ici
+	private void processTextParagraphs(List<XSLFTextParagraph> paragraphs, PptMapper mapper) {
+		for(XSLFTextParagraph paragraph : paragraphs) {
+			PptParser.replaceTextVariable(paragraph, mapper);
+		}
 	}
 	
 	private boolean shouldHide(SimpleShape<?, ?> simpleShape, PptMapper mapper) {

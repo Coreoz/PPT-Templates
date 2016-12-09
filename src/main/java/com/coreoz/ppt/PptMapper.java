@@ -20,7 +20,7 @@ public class PptMapper {
 	}
 	
 	public PptMapper text(String variableName, Object value) {
-		textMapping.put(variableName, PptTextMapper.of(value, null, null, null));
+		textMapping.put(variableName, PptTextMapper.of(value, null));
 		return this;
 	}
 	
@@ -36,8 +36,13 @@ public class PptMapper {
 	
 	// package API
 	
-	Optional<PptTextMapper> textMapping(String variableName) {
-		return Optional.ofNullable(textMapping.get(variableName));
+	Optional<String> textMapping(String variableName) {
+		return Optional
+			.ofNullable(textMapping.get(variableName))
+			.map(mapping -> mapping.getValue() == null ?
+				nullToEmpty(mapping.getSupplierToValue().get()).toString()
+				: nullToEmpty(mapping.getValue()).toString()
+			);
 	}
 
 	Optional<PptImageMapper> imageMapping(String variableName) {
@@ -50,4 +55,10 @@ public class PptMapper {
 			.map(hidingMapper -> hidingMapper.getShouldHide().test(argument));
 	}
 
+	// internal
+	
+	private static Object nullToEmpty(Object value) {
+		return value == null ? "" : value;
+	}
+	
 }
