@@ -11,6 +11,9 @@ import org.apache.poi.sl.usermodel.SimpleShape;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFShape;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
+import org.apache.poi.xslf.usermodel.XSLFTable;
+import org.apache.poi.xslf.usermodel.XSLFTableCell;
+import org.apache.poi.xslf.usermodel.XSLFTableRow;
 import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
 import org.apache.poi.xslf.usermodel.XSLFTextShape;
 
@@ -51,6 +54,19 @@ public class PptTemplates {
 		if(shape instanceof XSLFTextShape) {
 			return processTextShape((XSLFTextShape) shape, mapper);
 		}
+		if(shape instanceof XSLFTable) {
+			return processTableShape((XSLFTable) shape, mapper);
+		}
+		return false;
+	}
+	
+	private boolean processTableShape(XSLFTable tableShape, PptMapper mapper) {
+		for(XSLFTableRow row : tableShape.getRows()) {
+			for(XSLFTableCell cell : row.getCells()) {
+				processTextParagraphs(cell.getTextParagraphs(), mapper);
+			}
+		}
+		
 		return false;
 	}
 	
