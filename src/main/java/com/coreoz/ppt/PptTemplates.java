@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -160,24 +159,18 @@ public class PptTemplates {
 	}
 
 	private static void processTextParagraphs(List<XSLFTextParagraph> paragraphs, PptMapper mapper) {
-		for (Iterator<XSLFTextParagraph> iterator = paragraphs.iterator(); iterator.hasNext();) {
-			XSLFTextParagraph paragraph = iterator.next();
-			
-			if(shouldHide(PptParser.parse(paragraph.getText()), mapper)) {
-				iterator.remove();
-			} else {
-				for (XSLFTextRun textRun : paragraph.getTextRuns()) {
-					Optional<PptVariable> parsedHyperlinkVariale = parseHyperlinkVariale(textRun.getHyperlink());
-					
-					if(shouldHide(parsedHyperlinkVariale, mapper)) {
-						textRun.setText("");
-					} else if(parsedHyperlinkVariale.isPresent()) {
-						textRun.getXmlObject().getRPr().unsetHlinkClick();
-					}
-				}
+		for (XSLFTextParagraph paragraph : paragraphs) {
+			for (XSLFTextRun textRun : paragraph.getTextRuns()) {
+				Optional<PptVariable> parsedHyperlinkVariale = parseHyperlinkVariale(textRun.getHyperlink());
 				
-				PptParser.replaceTextVariable(paragraph, mapper);
+				if(shouldHide(parsedHyperlinkVariale, mapper)) {
+					textRun.setText("");	
+				} else if(parsedHyperlinkVariale.isPresent()) {
+					textRun.getXmlObject().getRPr().unsetHlinkClick();
+				}
 			}
+			
+			PptParser.replaceTextVariable(paragraph, mapper);
 		}
 	}
 	
