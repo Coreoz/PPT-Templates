@@ -11,7 +11,6 @@ import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.sl.usermodel.Hyperlink;
 import org.apache.poi.sl.usermodel.SimpleShape;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
-import org.apache.poi.xslf.usermodel.XSLFAutoShape;
 import org.apache.poi.xslf.usermodel.XSLFPictureData;
 import org.apache.poi.xslf.usermodel.XSLFPictureShape;
 import org.apache.poi.xslf.usermodel.XSLFShape;
@@ -78,9 +77,6 @@ public class PptTemplates {
 		if(shape instanceof XSLFTable) {
 			return processTableShape((XSLFTable) shape, mapper);
 		}
-		if(shape instanceof XSLFAutoShape) {
-			return processGeometryShape((XSLFAutoShape) shape, mapper);
-		}
 		if(shape instanceof XSLFPictureShape) {
 			return processImageShape(imagesToReplace, (XSLFPictureShape) shape, mapper);
 		}
@@ -126,16 +122,6 @@ public class PptTemplates {
             .outputFormat(targetFormat)
             .toOutputStream(byteArrayOutputStream);
         return byteArrayOutputStream.toByteArray();
-	}
-
-	private static boolean processGeometryShape(XSLFAutoShape geometryShape, PptMapper mapper) {
-		if(shouldHide(geometryShape, mapper)) {
-			return true;
-		}
-		
-		processTextParagraphs(geometryShape.getTextParagraphs(), mapper);
-		
-		return false;
 	}
 	
 	private static boolean processTableShape(XSLFTable tableShape, PptMapper mapper) {
