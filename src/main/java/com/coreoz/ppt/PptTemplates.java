@@ -14,6 +14,7 @@ import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFPictureData;
 import org.apache.poi.xslf.usermodel.XSLFPictureShape;
 import org.apache.poi.xslf.usermodel.XSLFShape;
+import org.apache.poi.xslf.usermodel.XSLFSimpleShape;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
 import org.apache.poi.xslf.usermodel.XSLFTable;
 import org.apache.poi.xslf.usermodel.XSLFTableCell;
@@ -185,15 +186,13 @@ public class PptTemplates {
 		}
 	}
 
-	private static boolean shouldHide(SimpleShape<?, ?> simpleShape, PptMapper mapper) {
+	private static boolean shouldHide(XSLFSimpleShape simpleShape, PptMapper mapper) {
 		Optional<PptVariable> parsedHyperlinkVariale = parseHyperlinkVariale(simpleShape);
 
 		// if the link is a variable, remove the link
 		parsedHyperlinkVariale.ifPresent(variable -> {
-			XSLFShape shape = (XSLFShape) simpleShape;
-
 			String xquery = "declare namespace p='http://schemas.openxmlformats.org/presentationml/2006/main' .//*/p:cNvPr";
-			XmlObject[] rs = shape.getXmlObject().selectPath(xquery);
+			XmlObject[] rs = simpleShape.getXmlObject().selectPath(xquery);
 			CTNonVisualDrawingProps nvPr = (CTNonVisualDrawingProps) rs[0];
 			nvPr.unsetHlinkClick();
 		});
