@@ -10,6 +10,7 @@
 
 	<name>PPT Templates</name>
 	<description>PPT Template is a small templating library to generate PowerPoint presentations.</description>
+	<url>https://github.com/Coreoz/PPT-Templates</url>
 
 	<organization>
 		<name>Coreoz</name>
@@ -33,6 +34,13 @@
 		</developer>
 	</developers>
 
+	<scm>
+		<developerConnection>scm:git:git@github.com:Coreoz/PPT-Templates.git</developerConnection>
+		<connection>scm:git:git@github.com:Coreoz/PPT-Templates.git</connection>
+		<url>https://github.com/Coreoz/PPT-Templates</url>
+		<tag>HEAD</tag>
+	</scm>
+
 	<distributionManagement>
 		<snapshotRepository>
 			<id>ossrh</id>
@@ -43,16 +51,6 @@
 			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
 		</repository>
 	</distributionManagement>
-
-	<repositories>
-		<repository>
-			<id>oss.snapshot</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
