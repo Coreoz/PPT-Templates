@@ -1,0 +1,53 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.coreoz</groupId>
+	<artifactId>ppt-template-demo</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>PPT Template Demo</name>
+	<description>A simple demo on how PPT Template can be used</description>
+
+	<organization>
+		<name>Coreoz</name>
+		<url>http://coreoz.com/</url>
+	</organization>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>Aurélien Manteaux</name>
+			<email>amanteaux@coreoz.com</email>
+			<organization>Coreoz</organization>
+			<organizationUrl>http://coreoz.com/</organizationUrl>
+		</developer>
+	</developers>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<additionalparam>-Xdoclint:none</additionalparam>
+
+		<poi.version>3.16-beta1</poi.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.coreoz</groupId>
+			<artifactId>ppt-template</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+
+</project>
