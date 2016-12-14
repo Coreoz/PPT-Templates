@@ -9,7 +9,7 @@
 	<packaging>jar</packaging>
 
 	<name>PPT Templates</name>
-	<description>PPT generation based on PPT templates</description>
+	<description>PPT Template is a small templating library to generate PowerPoint presentations.</description>
 
 	<organization>
 		<name>Coreoz</name>
