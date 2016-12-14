@@ -1,5 +1,8 @@
 PPT Templates
 =============
+
+[![Build Status](https://travis-ci.org/Coreoz/PPT-Templates.svg?branch=master)](https://travis-ci.org/Coreoz/PPT-Templates)
+
 PPT Template is a small templating library to generate PowerPoint presentations.
 This project is mainly based on [POI XSLF](https://poi.apache.org/slideshow/xslf-cookbook.html).
 
@@ -12,7 +15,7 @@ Include PPT Templates in your project:
 <dependency>
     <groupId>com.coreoz</groupId>
     <artifactId>ppt-templates</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0-beta1</version>
 </dependency>
 ```
 
