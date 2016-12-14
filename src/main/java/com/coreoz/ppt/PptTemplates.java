@@ -106,7 +106,7 @@ public class PptTemplates {
 	}
 
 	private static boolean processImageShape(List<ImageToReplace> imagesToReplace, XSLFPictureShape imageShape, PptMapper mapper) {
-		Optional<PptVariable> imageVariable = parseHyperlinkVariale(imageShape);
+		Optional<PptVariable> imageVariable = parseHyperlinkVariable(imageShape);
 		if(shouldHide(imageVariable, mapper)) {
 			return true;
 		}
@@ -187,7 +187,7 @@ public class PptTemplates {
 	}
 
 	private static boolean shouldHide(XSLFSimpleShape simpleShape, PptMapper mapper) {
-		Optional<PptVariable> parsedHyperlinkVariale = parseHyperlinkVariale(simpleShape);
+		Optional<PptVariable> parsedHyperlinkVariale = parseHyperlinkVariable(simpleShape);
 
 		// if the link is a variable, remove the link
 		parsedHyperlinkVariale.ifPresent(variable -> {
@@ -208,7 +208,7 @@ public class PptTemplates {
 			.orElse(false);
 	}
 
-	private static Optional<PptVariable> parseHyperlinkVariale(SimpleShape<?, ?> simpleShape) {
+	private static Optional<PptVariable> parseHyperlinkVariable(SimpleShape<?, ?> simpleShape) {
 		return parseHyperlinkVariale(simpleShape.getHyperlink());
 	}
 
