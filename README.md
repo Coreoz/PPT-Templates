@@ -42,8 +42,11 @@ For image replacement, styling or hiding elements, variables must be put on a li
 on these elements.
 
 Step 1:
+
 ![Link on an image - step 1](docs/change_hyperlink.png)
+
 Step 2:
+
 ![Link on an image - step 2](docs/change_hyperlink_popup.png)
 
 Demo
