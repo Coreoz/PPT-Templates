@@ -27,6 +27,7 @@ try(FileOutputStream out = new FileOutputStream("generated.pptx")) {
 }
 ```
 Tadaaa:
+
 ![PPT template hello wold](docs/hello_world.png)
 
 Features
