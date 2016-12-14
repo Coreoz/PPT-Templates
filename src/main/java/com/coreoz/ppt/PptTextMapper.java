@@ -9,5 +9,5 @@ class PptTextMapper {
 
 	private final Object value;
 	private final Supplier<?> supplierToValue;
-	
+
 }

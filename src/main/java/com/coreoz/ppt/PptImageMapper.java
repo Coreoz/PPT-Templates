@@ -9,5 +9,5 @@ class PptImageMapper {
 
 	private final PictureType targetFormat;
 	private final byte[] value;
-	
+
 }

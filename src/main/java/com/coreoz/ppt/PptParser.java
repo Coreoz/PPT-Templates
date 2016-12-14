@@ -8,7 +8,7 @@ import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
 import org.apache.poi.xslf.usermodel.XSLFTextRun;
 
 class PptParser {
-	
+
 	static Optional<PptVariable> parse(String text) {
 		if(text.startsWith("$/") && text.endsWith("/")) {
 			int indexStartParameter = text.indexOf(':');
@@ -22,24 +22,24 @@ class PptParser {
 		}
 		return Optional.empty();
 	}
-	
+
 	static void replaceTextVariable(XSLFTextParagraph paragraph, PptMapper mapper) {
 		int indexOfStartVariable = -1;
 		List<XSLFTextRun> textPartsVariable = null;
 		StringBuilder variableName = null;
 		State currentState = State.INITIAL;
-		
+
 		for(XSLFTextRun textPart : paragraph.getTextRuns()) {
 			char[] textPartRaw = textPart.getRawText().trim().toCharArray();
 			int indexOfChar = 0;
-			
+
 			if(currentState == State.MAY_BE_VARIABLE || currentState == State.START_VARIABLE || currentState == State.VARIABLE) {
 				textPartsVariable.add(textPart);
 			}
-			
+
 			for(char c : textPartRaw) {
 				State nextState = process(currentState, c);
-				
+
 				switch (nextState) {
 				case INITIAL:
 					if(currentState != State.INITIAL) {
@@ -47,21 +47,21 @@ class PptParser {
 						textPartsVariable = null;
 						variableName = null;
 					}
-					
+
 					break;
 				case MAY_BE_VARIABLE:
 					indexOfStartVariable = indexOfChar;
 					textPartsVariable = new ArrayList<>();
 					textPartsVariable.add(textPart);
-					
+
 					break;
 				case START_VARIABLE:
 					variableName = new StringBuilder();
-					
+
 					break;
 				case VARIABLE:
 					variableName.append(c);
-					
+
 					break;
 				case END_VARIABLE:
 					replaceVariable(
@@ -72,19 +72,19 @@ class PptParser {
 					);
 					break;
 				}
-				
+
 				indexOfChar++;
 				currentState = nextState;
 			}
 		}
 	}
-	
+
 	private static void replaceVariable(int indexOfStartVariable, int indexOfEndVariable,
 			Optional<String> replacedText, List<XSLFTextRun> textParts) {
 		if(!replacedText.isPresent()) {
 			return;
 		}
-		
+
 		for (int i = 0; i < textParts.size(); i++) {
 			XSLFTextRun textPart = textParts.get(i);
 			if(i == 0) {
@@ -102,7 +102,7 @@ class PptParser {
 			}
 		}
 	}
-	
+
 	private static State process(State before, char c) {
 		switch (before) {
 		case INITIAL:
@@ -127,10 +127,10 @@ class PptParser {
 			return State.VARIABLE;
 		case END_VARIABLE:
 		}
-		
+
 		return State.INITIAL;
 	}
-	
+
 	private static enum State {
 		INITIAL,
 		MAY_BE_VARIABLE,

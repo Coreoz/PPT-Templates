@@ -6,7 +6,7 @@ import lombok.Value;
 
 @Value(staticConstructor = "of")
 class PptHidingMapper {
-	
+
 	private final Predicate<String> shouldHide;
 
 }

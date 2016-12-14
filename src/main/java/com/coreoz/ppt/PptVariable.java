@@ -7,5 +7,5 @@ class PptVariable {
 
 	private final String name;
 	private final String arg1;
-	
+
 }
