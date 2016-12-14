@@ -45,3 +45,7 @@ Step 1:
 ![Link on an image - step 1](docs/change_hyperlink.png)
 Step 2:
 ![Link on an image - step 2](docs/change_hyperlink_popup.png)
+
+Demo
+----
+See the [demonstration project](demo).
