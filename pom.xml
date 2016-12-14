@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.coreoz</groupId>
-	<artifactId>ppt-template</artifactId>
+	<artifactId>ppt-templates</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>PPT Template</name>
+	<name>PPT Templates</name>
 	<description>PPT generation based on PPT templates</description>
 
 	<organization>

@@ -12,7 +12,7 @@ import com.coreoz.ppt.PptMapper;
 public class PptTemplateDemo {
 
 	public static void main(String[] args) throws IOException {
-		try(FileOutputStream out = new FileOutputStream("full_content_transformed.pptx")) {
+		try(FileOutputStream out = new FileOutputStream("generated.pptx")) {
 			new PptMapper()
 				.hide("hidden", arg -> "true".equals(arg))
 				.text("var1", "Content replaced")
@@ -23,10 +23,10 @@ public class PptTemplateDemo {
 					textRun.setBold(true);
 					textRun.setFontColor(Color.GREEN);
 				})
-				.processTemplate(PptTemplateDemo.class.getResourceAsStream("/full_content.pptx"))
+				.processTemplate(PptTemplateDemo.class.getResourceAsStream("/template.pptx"))
 				.write(out);
 		}
-		System.out.println("Templated presentation generated in " + Paths.get("full_content_transformed.pptx").toAbsolutePath());
+		System.out.println("Templated presentation generated in " + Paths.get("generated.pptx").toAbsolutePath());
 	}
 
 }
