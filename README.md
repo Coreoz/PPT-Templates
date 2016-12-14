@@ -13,10 +13,10 @@ Include PPT Templates in your project:
     <groupId>com.coreoz</groupId>
     <artifactId>ppt-templates</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-</dependency
+</dependency>
 ```
 
-Create a template and fill it with your mapper:
+Create a template and fill it with your data:
 ```java
 try(FileOutputStream out = new FileOutputStream("generated.pptx")) {
   new PptMapper()
@@ -27,7 +27,7 @@ try(FileOutputStream out = new FileOutputStream("generated.pptx")) {
 }
 ```
 Tadaaa:
-![PPT template hello wold](docs/hello_wold.png)
+![PPT template hello wold](docs/hello_world.png)
 
 Features
 --------
@@ -40,6 +40,7 @@ This features are directly configurable via the `com.coreoz.ppt.PptMapper` API.
 
 For image replacement, styling or hiding elements, variables must be put on a link
 on these elements.
+
 Step 1:
 ![Link on an image - step 1](docs/change_hyperlink.png)
 Step 2:
