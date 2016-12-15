@@ -30,11 +30,11 @@ class PptParser {
 
 			currentHandler.registerTextPart(textPart);
 
-			currentHandler = handleTextPart(currentHandler, textPart).orElse(currentHandler);
+			currentHandler = handleTextPart(currentHandler, textPart);
 		}
 	}
 
-	private static Optional<AbstractCharacterHandler> handleTextPart(AbstractCharacterHandler currentHandler, XSLFTextRun textPart) {
+	private static AbstractCharacterHandler handleTextPart(AbstractCharacterHandler currentHandler, XSLFTextRun textPart) {
 		char[] textPartRaw = textPart.getRawText().trim().toCharArray();
 		int indexOfChar = 0;
 		AbstractCharacterHandler nextHandler = currentHandler;
@@ -44,7 +44,7 @@ class PptParser {
 
             nextHandler.processCharacter(c, indexOfChar++, textPart);
         }
-		return Optional.ofNullable(nextHandler);
+		return nextHandler;
 	}
 
 }
