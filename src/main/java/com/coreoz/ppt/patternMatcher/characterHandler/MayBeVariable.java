@@ -15,9 +15,9 @@ public class MayBeVariable extends AbstractCharacterHandler {
     @Override
     public AbstractCharacterHandler getNextHandler(char car) {
         if(car == '/') {
-            return new StartAbstractCharacter(this.mapper, this.patternRecognized);
+            return new StartCharacter(this.mapper, this.patternRecognized);
         }
-        return new FirstAbstractCharacter(mapper);
+        return new FirstCharacter(mapper);
     }
 
     @Override

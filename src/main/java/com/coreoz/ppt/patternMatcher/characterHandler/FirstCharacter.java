@@ -6,8 +6,8 @@ import org.apache.poi.xslf.usermodel.XSLFTextRun;
 /**
  * Created by ubu on 14/12/16.
  */
-public class FirstAbstractCharacter extends AbstractCharacterHandler {
-    public FirstAbstractCharacter(PptMapper mapper) {
+public class FirstCharacter extends AbstractCharacterHandler {
+    public FirstCharacter(PptMapper mapper) {
         super(mapper);
     }
 
@@ -15,7 +15,7 @@ public class FirstAbstractCharacter extends AbstractCharacterHandler {
         if(car == '$') {
             return new MayBeVariable(this.mapper, this.patternRecognized);
         }
-        return new FirstAbstractCharacter(mapper);
+        return new FirstCharacter(mapper);
     }
 
     @Override

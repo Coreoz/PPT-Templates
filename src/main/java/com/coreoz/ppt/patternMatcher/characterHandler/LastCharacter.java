@@ -9,14 +9,14 @@ import java.util.Optional;
 /**
  * Created by ubu on 14/12/16.
  */
-public class LastAbstractCharacter extends AbstractCharacterHandler {
-    public LastAbstractCharacter(PptMapper mapper, PatternRecognized patternRecognized) {
+public class LastCharacter extends AbstractCharacterHandler {
+    public LastCharacter(PptMapper mapper, PatternRecognized patternRecognized) {
         super(mapper, patternRecognized);
     }
 
     @Override
     public AbstractCharacterHandler getNextHandler(char car) {
-        return new FirstAbstractCharacter(mapper);
+        return new FirstCharacter(mapper);
     }
 
     @Override

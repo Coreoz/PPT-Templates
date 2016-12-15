@@ -7,17 +7,17 @@ import org.apache.poi.xslf.usermodel.XSLFTextRun;
 /**
  * Created by ubu on 14/12/16.
  */
-public class StartAbstractCharacter extends AbstractCharacterHandler {
-    public StartAbstractCharacter(PptMapper mapper, PatternRecognized patternRecognized) {
+public class StartCharacter extends AbstractCharacterHandler {
+    public StartCharacter(PptMapper mapper, PatternRecognized patternRecognized) {
         super(mapper, patternRecognized);
     }
 
     @Override
     public AbstractCharacterHandler getNextHandler(char car) {
         if(car != '/') {
-            return new InsideAbstractCharacter(this.mapper, this.patternRecognized);
+            return new InsideCharacter(this.mapper, this.patternRecognized);
         }
-        return new FirstAbstractCharacter(mapper);
+        return new FirstCharacter(mapper);
     }
 
     @Override
