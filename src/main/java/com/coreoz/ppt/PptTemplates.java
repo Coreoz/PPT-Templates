@@ -24,6 +24,9 @@ import org.apache.poi.xslf.usermodel.XSLFTextRun;
 import org.apache.poi.xslf.usermodel.XSLFTextShape;
 import org.apache.xmlbeans.XmlObject;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTNonVisualDrawingProps;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTTableCell;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTTextBody;
+import org.openxmlformats.schemas.presentationml.x2006.main.CTShape;
 
 import lombok.SneakyThrows;
 import lombok.Value;
@@ -149,7 +152,10 @@ public class PptTemplates {
 	private static boolean processTableShape(XSLFTable tableShape, PptMapper mapper) {
 		for(XSLFTableRow row : tableShape.getRows()) {
 			for(XSLFTableCell cell : row.getCells()) {
-				processTextParagraphs(cell.getTextParagraphs(), mapper);
+				deleteParagraphsByIndex(
+					processTextParagraphs(cell.getTextParagraphs(), mapper),
+					((CTTableCell)cell.getXmlObject()).getTxBody()
+				);
 			}
 		}
 
@@ -161,13 +167,25 @@ public class PptTemplates {
 			return true;
 		}
 
-		processTextParagraphs(textShape.getTextParagraphs(), mapper);
+		deleteParagraphsByIndex(
+			processTextParagraphs(textShape.getTextParagraphs(), mapper),
+			((CTShape)textShape.getXmlObject()).getTxBody()
+		);
 
 		return false;
 	}
 
-	private static void processTextParagraphs(List<XSLFTextParagraph> paragraphs, PptMapper mapper) {
-		for (XSLFTextParagraph paragraph : paragraphs) {
+	private static void deleteParagraphsByIndex(List<Integer> indexesToDelete, CTTextBody textBodyXmlNode) {
+		int nbDeleted = 0;
+		for(Integer indexToDelete : indexesToDelete) {
+			textBodyXmlNode.removeP(indexToDelete - nbDeleted++);
+		}
+	}
+
+	private static List<Integer> processTextParagraphs(List<XSLFTextParagraph> paragraphs, PptMapper mapper) {
+		List<Integer> toDelete = new ArrayList<>();
+		for (int i=0; i<paragraphs.size(); i++) {
+			XSLFTextParagraph paragraph = paragraphs.get(i);
 			for (XSLFTextRun textRun : paragraph.getTextRuns()) {
 				Optional<PptVariable> parsedHyperlinkVariale = parseHyperlinkVariale(textRun.getHyperlink());
 
@@ -176,7 +194,11 @@ public class PptTemplates {
 					.ifPresent(styler -> styler.accept(parsedHyperlinkVariale.get().getArg1(), textRun));
 
 				if(shouldHide(parsedHyperlinkVariale, mapper)) {
-					textRun.setText("");
+					if(paragraph.getTextRuns().size() == 1) {
+						toDelete.add(i);
+					} else {
+						textRun.setText("");
+					}
 				} else if(parsedHyperlinkVariale.isPresent()) {
 					textRun.getXmlObject().getRPr().unsetHlinkClick();
 				}
@@ -184,6 +206,7 @@ public class PptTemplates {
 
 			PptParser.replaceTextVariable(paragraph, mapper);
 		}
+		return toDelete;
 	}
 
 	private static boolean shouldHide(XSLFSimpleShape simpleShape, PptMapper mapper) {
