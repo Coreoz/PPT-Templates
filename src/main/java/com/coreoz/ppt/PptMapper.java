@@ -146,7 +146,7 @@ public class PptMapper {
 
 	// package API
 
-	Optional<String> textMapping(String variableName) {
+	public Optional<String> textMapping(String variableName) {
 		return Optional
 			.ofNullable(textMapping.get(variableName))
 			.map(mapping -> mapping.getValue() == null ?
