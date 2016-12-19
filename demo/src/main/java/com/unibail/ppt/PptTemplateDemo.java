@@ -1,6 +1,7 @@
 package com.unibail.ppt;
 
 import java.awt.Color;
+import java.awt.geom.Rectangle2D;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -28,6 +29,16 @@ public class PptTemplateDemo {
 				.styleText("style", textRun -> {
 					textRun.setBold(true);
 					textRun.setFontColor(Color.GREEN);
+				})
+				.styleShape("percentage", shape -> {
+					Rectangle2D shapeAnchor = shape.getAnchor();
+					shape.setAnchor(new Rectangle2D.Double(
+						shapeAnchor.getX(),
+						shapeAnchor.getY(),
+						// widen the shape of 20%
+						shapeAnchor.getWidth() * 1.2,
+						shapeAnchor.getHeight()
+					));
 				})
 				.processTemplate(PptTemplateDemo.class.getResourceAsStream("/template.pptx"))
 				.write(out);
