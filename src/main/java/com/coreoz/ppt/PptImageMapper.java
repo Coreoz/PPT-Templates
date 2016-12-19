@@ -8,6 +8,7 @@ import lombok.Value;
 class PptImageMapper {
 
 	private final PictureType targetFormat;
+	private final PptImageReplacementMode replacementMode;
 	private final byte[] value;
 
 }

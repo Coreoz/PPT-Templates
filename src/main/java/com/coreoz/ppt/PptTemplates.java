@@ -1,7 +1,7 @@
 package com.coreoz.ppt;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.awt.Dimension;
+import java.awt.geom.Rectangle2D;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +30,6 @@ import org.openxmlformats.schemas.presentationml.x2006.main.CTShape;
 
 import lombok.SneakyThrows;
 import lombok.Value;
-import net.coobird.thumbnailator.Thumbnails;
-import net.coobird.thumbnailator.geometry.Positions;
 
 /**
  * Enable to update PowerPoint presentation with dynamic data via a variable system.<br/>
@@ -124,7 +122,7 @@ public class PptTemplates {
 	}
 
 	private static void replaceImage(XMLSlideShow ppt, XSLFSlide slide, ImageToReplace imageToReplace) {
-		byte[] newPictureResized = resizeImage(
+		byte[] newPictureResized = imageToReplace.imageMapper.getReplacementMode().resize(
 			imageToReplace.imageMapper.getValue(),
 			imageToReplace.imageMapper.getTargetFormat().name(),
 			(int) imageToReplace.toReplace.getAnchor().getWidth(),
@@ -132,21 +130,16 @@ public class PptTemplates {
 		);
 		XSLFPictureData newPictureData = ppt.addPicture(newPictureResized, imageToReplace.imageMapper.getTargetFormat());
 		XSLFPictureShape newPictureShape = slide.createPicture(newPictureData);
-		newPictureShape.setAnchor(imageToReplace.toReplace.getAnchor());
-		slide.removeShape(imageToReplace.toReplace);
-	}
+		Rectangle2D imageAnchor = imageToReplace.toReplace.getAnchor();
 
-	@SneakyThrows
-	private static byte[] resizeImage(byte[] imageData, String targetFormat, int width, int height) {
-		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		Thumbnails
-			.of(new ByteArrayInputStream(imageData))
-			.crop(Positions.CENTER)
-			.outputQuality(1F)
-			.size(width, height)
-			.outputFormat(targetFormat)
-			.toOutputStream(byteArrayOutputStream);
-		return byteArrayOutputStream.toByteArray();
+		if(imageToReplace.imageMapper.getReplacementMode() == PptImageReplacementMode.RESIZE_CROP) {
+			newPictureShape.setAnchor(imageAnchor);
+		} else {
+			Dimension newImageSize = ImagesUtils.imageDimension(newPictureResized);
+			newPictureShape.setAnchor(new Rectangle2D.Double(imageAnchor.getX(), imageAnchor.getY(), newImageSize.getWidth(), newImageSize.getHeight()));
+		}
+
+		slide.removeShape(imageToReplace.toReplace);
 	}
 
 	private static boolean processTableShape(XSLFTable tableShape, PptMapper mapper) {

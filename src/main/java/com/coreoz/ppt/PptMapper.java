@@ -58,11 +58,57 @@ public class PptMapper {
 	 *
 	 * @param variableName The variable name.
 	 * It should be in the form of <code>$/variableName:'argument'/</code> in the PPT presentation
-	 * @param imageData The raw data of the JPG image that will replace the placeholder
+	 * @param imageData The raw data of the image that will replace the placeholder
 	 * @return The mapper instance
 	 */
-	public PptMapper imageJpg(String variableName, byte[] imageData) {
-		imageMapping.put(variableName, PptImageMapper.of(PictureType.JPEG, imageData));
+	public PptMapper image(String variableName, byte[] imageData) {
+		return image(variableName, imageData, PptImageReplacementMode.RESIZE_CROP);
+	}
+
+	/**
+	 * Replace an image placeholder by an other image.
+	 * This image placeholder is identified with a link placed on it.
+	 * To fit the placeholder, the replacement mode will be used to
+	 * resize the image.
+	 *
+	 * @param variableName The variable name.
+	 * It should be in the form of <code>$/variableName:'argument'/</code> in the PPT presentation
+	 * @param imageData The raw data of the image that will replace the placeholder
+	 * @param replacementMode Define how the image should be resized, see {@link PptImageReplacementMode}
+	 * @return The mapper instance
+	 */
+	public PptMapper image(String variableName, byte[] imageData,
+			PptImageReplacementMode replacementMode) {
+		PictureType imageFormat = ImagesUtils.guessPictureType(imageData);
+		if(imageFormat == null) {
+			throw new IllegalArgumentException(
+				"Enable to determine the image type, "
+				+ "you may want to directly specify the image type using: "
+				+ "image(String variableName, byte[] imageData, "
+				+ "PptImageReplacementMode replacementMode, PictureType imageFormat)"
+			);
+		}
+
+		return image(variableName, imageData, replacementMode, imageFormat);
+	}
+
+	/**
+	 * Replace an image placeholder by an other image.
+	 * This image placeholder is identified with a link placed on it.
+	 * To fit the placeholder, the replacement mode will be used to
+	 * resize the image.
+	 *
+	 * @param variableName The variable name.
+	 * It should be in the form of <code>$/variableName:'argument'/</code> in the PPT presentation
+	 * @param imageData The raw data of the image that will replace the placeholder
+	 * @param replacementMode Define how the image should be resized, see {@link PptImageReplacementMode}
+	 * @param imageFormat specify the picture format that will be used in the PPT ;
+	 * note that this format may differ from the original format of the replacement image
+	 * @return The mapper instance
+	 */
+	public PptMapper image(String variableName, byte[] imageData,
+			PptImageReplacementMode replacementMode, PictureType imageFormat) {
+		imageMapping.put(variableName, PptImageMapper.of(imageFormat, replacementMode, imageData));
 		return this;
 	}
 
