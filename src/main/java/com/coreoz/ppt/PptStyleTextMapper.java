@@ -9,6 +9,6 @@ import lombok.Value;
 @Value(staticConstructor = "of")
 class PptStyleTextMapper {
 
-	private final BiConsumer<String, TextRun> applyText;
+	private final BiConsumer<String, TextRun> applyStyle;
 
 }

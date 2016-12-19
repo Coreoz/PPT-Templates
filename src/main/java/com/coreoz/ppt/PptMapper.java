@@ -11,6 +11,7 @@ import java.util.function.Predicate;
 import org.apache.poi.sl.usermodel.PictureData.PictureType;
 import org.apache.poi.sl.usermodel.TextRun;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
+import org.apache.poi.xslf.usermodel.XSLFSimpleShape;
 
 /**
  * Bind PowerPoint variables to actions :<br/>
@@ -25,12 +26,14 @@ public class PptMapper {
 	private final Map<String, PptImageMapper> imageMapping;
 	private final Map<String, PptHidingMapper> hideMapping;
 	private final Map<String, PptStyleTextMapper> styleTextMapping;
+	private final Map<String, PptStyleShapeMapper> styleShapeMapping;
 
 	public PptMapper() {
 		this.textMapping = new HashMap<>();
 		this.imageMapping = new HashMap<>();
 		this.hideMapping = new HashMap<>();
 		this.styleTextMapping = new HashMap<>();
+		this.styleShapeMapping = new HashMap<>();
 	}
 
 	// configuration
@@ -121,8 +124,7 @@ public class PptMapper {
 	 * @return The mapper instance
 	 */
 	public PptMapper hide(String variableName) {
-		hideMapping.put(variableName, PptHidingMapper.of(arg -> true));
-		return this;
+		return hide(variableName, arg -> true);
 	}
 
 	/**
@@ -150,8 +152,7 @@ public class PptMapper {
 	 * @return The mapper instance
 	 */
 	public PptMapper styleText(String variableName, Consumer<TextRun> applyText) {
-		styleTextMapping.put(variableName, PptStyleTextMapper.of((arg, textRun) -> applyText.accept(textRun)));
-		return this;
+		return styleText(variableName, (arg, textRun) -> applyText.accept(textRun));
 	}
 
 	/**
@@ -167,6 +168,36 @@ public class PptMapper {
 	 */
 	public PptMapper styleText(String variableName, BiConsumer<String, TextRun> applyText) {
 		styleTextMapping.put(variableName, PptStyleTextMapper.of(applyText));
+		return this;
+	}
+
+	/**
+	 * Style a shape in the presentation by directly modifying the {@link XSLFSimpleShape}
+	 * object provided by POI.
+	 * The shape object is identified with a link placed on it.
+	 *
+	 * @param variableName The variable name.
+	 * It should be in the form of <code>$/variableName:'argument'/</code> in the PPT presentation
+	 * @param applyShape The consumer that will directly change the {@link XSLFSimpleShape}
+	 * @return The mapper instance
+	 */
+	public PptMapper styleShape(String variableName, Consumer<XSLFSimpleShape> applyShape) {
+		return styleShape(variableName, (arg, shape) -> applyShape.accept(shape));
+	}
+
+	/**
+	 * Style a shape in the presentation by directly modifying the {@link XSLFSimpleShape}
+	 * object provided by POI.
+	 * The shape object is identified with a link placed on it.
+	 *
+	 * @param variableName The variable name.
+	 * It should be in the form of <code>$/variableName:'argument'/</code> in the PPT presentation
+	 * @param applyShape The bi consumer that will directly change the {@link XSLFSimpleShape},
+	 * the first consumer parameter is the variable argument
+	 * @return The mapper instance
+	 */
+	public PptMapper styleShape(String variableName, BiConsumer<String, XSLFSimpleShape> applyShape) {
+		styleShapeMapping.put(variableName, PptStyleShapeMapper.of(applyShape));
 		return this;
 	}
 
@@ -214,7 +245,13 @@ public class PptMapper {
 	Optional<BiConsumer<String, TextRun>> styleText(String variableName) {
 		return Optional
 			.ofNullable(styleTextMapping.get(variableName))
-			.map(PptStyleTextMapper::getApplyText);
+			.map(PptStyleTextMapper::getApplyStyle);
+	}
+
+	Optional<BiConsumer<String, XSLFSimpleShape>> styleShape(String variableName) {
+		return Optional
+			.ofNullable(styleShapeMapping.get(variableName))
+			.map(PptStyleShapeMapper::getApplyStyle);
 	}
 
 	// internal

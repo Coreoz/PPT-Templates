@@ -6,10 +6,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.sl.usermodel.Hyperlink;
-import org.apache.poi.sl.usermodel.SimpleShape;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFPictureData;
 import org.apache.poi.xslf.usermodel.XSLFPictureShape;
@@ -114,9 +114,11 @@ public class PptTemplates {
 
 		imageVariable
 			.flatMap(variable -> mapper.imageMapping(variable.getName()))
-			.ifPresent(imageMapper -> {
-				imagesToReplace.add(ImageToReplace.of(imageShape, imageMapper));
-			});
+			.ifPresent(imageMapper ->
+				imagesToReplace.add(ImageToReplace.of(imageShape, imageMapper))
+			);
+
+		styleShape(imageShape, imageVariable, mapper);
 
 		return false;
 	}
@@ -156,7 +158,8 @@ public class PptTemplates {
 	}
 
 	private static boolean processTextShape(XSLFTextShape textShape, PptMapper mapper) {
-		if(shouldHide(textShape, mapper)) {
+		Optional<PptVariable> textVariable = parseHyperlinkVariable(textShape);
+		if(shouldHide(textVariable, mapper)) {
 			return true;
 		}
 
@@ -164,6 +167,8 @@ public class PptTemplates {
 			processTextParagraphs(textShape.getTextParagraphs(), mapper),
 			((CTShape)textShape.getXmlObject()).getTxBody()
 		);
+
+		styleShape(textShape, textVariable, mapper);
 
 		return false;
 	}
@@ -202,18 +207,19 @@ public class PptTemplates {
 		return toDelete;
 	}
 
-	private static boolean shouldHide(XSLFSimpleShape simpleShape, PptMapper mapper) {
-		Optional<PptVariable> parsedHyperlinkVariale = parseHyperlinkVariable(simpleShape);
-
-		// if the link is a variable, remove the link
-		parsedHyperlinkVariale.ifPresent(variable -> {
-			String xquery = "declare namespace p='http://schemas.openxmlformats.org/presentationml/2006/main' .//*/p:cNvPr";
-			XmlObject[] rs = simpleShape.getXmlObject().selectPath(xquery);
-			CTNonVisualDrawingProps nvPr = (CTNonVisualDrawingProps) rs[0];
-			nvPr.unsetHlinkClick();
-		});
-
-		return shouldHide(parsedHyperlinkVariale, mapper);
+	private static void styleShape(XSLFSimpleShape simpleShape, Optional<PptVariable> variableOption, PptMapper mapper) {
+		variableOption
+			.flatMap(variable ->
+				mapper
+					.styleShape(variable.getName())
+					.map(shapeStyler ->
+						// pre-fill the bi consumer styler with the variable argument
+						(Consumer<XSLFSimpleShape>) shape -> shapeStyler.accept(variable.getArg1(), shape)
+					)
+			)
+			.ifPresent(shapeStyler ->
+				shapeStyler.accept(simpleShape)
+			);
 	}
 
 	private static boolean shouldHide(Optional<PptVariable> variable, PptMapper mapper) {
@@ -224,8 +230,18 @@ public class PptTemplates {
 			.orElse(false);
 	}
 
-	private static Optional<PptVariable> parseHyperlinkVariable(SimpleShape<?, ?> simpleShape) {
-		return parseHyperlinkVariale(simpleShape.getHyperlink());
+	private static Optional<PptVariable> parseHyperlinkVariable(XSLFSimpleShape simpleShape) {
+		Optional<PptVariable> parsedHyperlinkVariale = parseHyperlinkVariale(simpleShape.getHyperlink());
+
+		// if the link is a variable, remove the link
+		parsedHyperlinkVariale.ifPresent(variable -> {
+			String xquery = "declare namespace p='http://schemas.openxmlformats.org/presentationml/2006/main' .//*/p:cNvPr";
+			XmlObject[] rs = simpleShape.getXmlObject().selectPath(xquery);
+			CTNonVisualDrawingProps nvPr = (CTNonVisualDrawingProps) rs[0];
+			nvPr.unsetHlinkClick();
+		});
+
+		return parsedHyperlinkVariale;
 	}
 
 
