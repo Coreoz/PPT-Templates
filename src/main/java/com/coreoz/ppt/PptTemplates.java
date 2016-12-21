@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import org.apache.poi.POIXMLDocumentPart;
+import org.apache.poi.POIXMLDocumentPart.RelationPart;
+import org.apache.poi.PptPoiBridge;
 import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.sl.usermodel.Hyperlink;
 import org.apache.poi.sl.usermodel.ShapeContainer;
@@ -15,6 +18,7 @@ import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFGroupShape;
 import org.apache.poi.xslf.usermodel.XSLFPictureData;
 import org.apache.poi.xslf.usermodel.XSLFPictureShape;
+import org.apache.poi.xslf.usermodel.XSLFRelation;
 import org.apache.poi.xslf.usermodel.XSLFShape;
 import org.apache.poi.xslf.usermodel.XSLFSimpleShape;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
@@ -25,9 +29,11 @@ import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
 import org.apache.poi.xslf.usermodel.XSLFTextRun;
 import org.apache.poi.xslf.usermodel.XSLFTextShape;
 import org.apache.xmlbeans.XmlObject;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTBlip;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTNonVisualDrawingProps;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTTableCell;
 import org.openxmlformats.schemas.drawingml.x2006.main.CTTextBody;
+import org.openxmlformats.schemas.presentationml.x2006.main.CTPicture;
 import org.openxmlformats.schemas.presentationml.x2006.main.CTShape;
 
 import lombok.SneakyThrows;
@@ -139,7 +145,7 @@ public class PptTemplates {
 		return false;
 	}
 
-	private static void replaceImage(XMLSlideShow ppt, ShapeContainer<XSLFShape, ?> slide, ImageToReplace imageToReplace) {
+	private static void replaceImage(XMLSlideShow ppt, ShapeContainer<XSLFShape, ?> shapeContainer, ImageToReplace imageToReplace) {
 		byte[] newPictureResized = imageToReplace.imageMapper.getReplacementMode().resize(
 			imageToReplace.imageMapper.getValue(),
 			imageToReplace.imageMapper.getTargetFormat().name(),
@@ -147,17 +153,54 @@ public class PptTemplates {
 			(int) imageToReplace.toReplace.getAnchor().getHeight()
 		);
 		XSLFPictureData newPictureData = ppt.addPicture(newPictureResized, imageToReplace.imageMapper.getTargetFormat());
-		XSLFPictureShape newPictureShape = (XSLFPictureShape) slide.createPicture(newPictureData);
-		Rectangle2D imageAnchor = imageToReplace.toReplace.getAnchor();
+		Rectangle2D newImageAnchor = computeNewImageAnchor(
+			imageToReplace.toReplace.getAnchor(),
+			newPictureResized,
+			imageToReplace.imageMapper.getReplacementMode()
+		);
 
-		if(imageToReplace.imageMapper.getReplacementMode() == PptImageReplacementMode.RESIZE_CROP) {
-			newPictureShape.setAnchor(imageAnchor);
-		} else {
-			Dimension newImageSize = ImagesUtils.imageDimension(newPictureResized);
-			newPictureShape.setAnchor(new Rectangle2D.Double(imageAnchor.getX(), imageAnchor.getY(), newImageSize.getWidth(), newImageSize.getHeight()));
+		// If the container is a slide, we can use the old image element,
+		// keep all its properties (among the z-index), and just update its relation
+		// to point to the new picture data
+		if(shapeContainer instanceof POIXMLDocumentPart) {
+			POIXMLDocumentPart containerDocument = ((POIXMLDocumentPart) shapeContainer);
+
+			RelationPart rp = containerDocument.addRelation(null, XSLFRelation.IMAGES, newPictureData);
+			CTPicture pictureXml = (CTPicture) imageToReplace.toReplace.getXmlObject();
+			CTBlip pictureBlip = pictureXml.getBlipFill().getBlip();
+
+			// clean up the old picture data
+			PptPoiBridge.removeRelation(containerDocument, containerDocument.getRelationById(pictureBlip.getEmbed()));
+
+			pictureBlip.setEmbed(rp.getRelationship().getId());
+
+			imageToReplace.toReplace.setAnchor(newImageAnchor);
+		}
+		// If the container is something else, like a group of elements,
+		// it is working another way and I don't have the time to investigate :)
+		// Anyway, this fall back should work, the only problem
+		// is that the old image properties won't be kept
+		else {
+			XSLFPictureShape newPictureShape = (XSLFPictureShape) shapeContainer.createPicture(newPictureData);
+			newPictureShape.setAnchor(newImageAnchor);
+
+			shapeContainer.removeShape(imageToReplace.toReplace);
+		}
+	}
+
+	private static Rectangle2D computeNewImageAnchor(Rectangle2D imageAnchor,
+			byte[] newPictureResized,PptImageReplacementMode replacementMode) {
+		if(replacementMode == PptImageReplacementMode.RESIZE_CROP) {
+			return imageAnchor;
 		}
 
-		slide.removeShape(imageToReplace.toReplace);
+		Dimension newImageSize = ImagesUtils.imageDimension(newPictureResized);
+		return new Rectangle2D.Double(
+			imageAnchor.getX(),
+			imageAnchor.getY(),
+			newImageSize.getWidth(),
+			newImageSize.getHeight()
+		);
 	}
 
 	private static boolean processTableShape(XSLFTable tableShape, PptMapper mapper) {
