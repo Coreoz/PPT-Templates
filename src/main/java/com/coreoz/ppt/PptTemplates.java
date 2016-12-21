@@ -10,7 +10,9 @@ import java.util.function.Consumer;
 
 import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.sl.usermodel.Hyperlink;
+import org.apache.poi.sl.usermodel.ShapeContainer;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
+import org.apache.poi.xslf.usermodel.XSLFGroupShape;
 import org.apache.poi.xslf.usermodel.XSLFPictureData;
 import org.apache.poi.xslf.usermodel.XSLFPictureShape;
 import org.apache.poi.xslf.usermodel.XSLFShape;
@@ -66,22 +68,7 @@ public class PptTemplates {
 	 */
 	public static XMLSlideShow processPpt(XMLSlideShow ppt, PptMapper mapper) {
 		for(XSLFSlide slide : ppt.getSlides()) {
-			List<ImageToReplace> imagesToReplace = new ArrayList<>();
-			List<XSLFShape> shapesToDelete = new ArrayList<>();
-
-			for(XSLFShape shape : slide.getShapes()) {
-				if(processShape(imagesToReplace, shape, mapper)) {
-					shapesToDelete.add(shape);
-				}
-			}
-
-			for(XSLFShape shapeToDelete : shapesToDelete) {
-				slide.removeShape(shapeToDelete);
-			}
-
-			for(ImageToReplace imageToReplace : imagesToReplace) {
-				replaceImage(ppt, slide, imageToReplace);
-			}
+			processShapesContainer(slide, ppt, mapper);
 		}
 
 		return ppt;
@@ -89,11 +76,30 @@ public class PptTemplates {
 
 	// internal
 
+	private static void processShapesContainer(ShapeContainer<XSLFShape, ?> shapeContainer, XMLSlideShow ppt, PptMapper mapper) {
+		List<ImageToReplace> imagesToReplace = new ArrayList<>();
+		List<XSLFShape> shapesToDelete = new ArrayList<>();
+
+		for(XSLFShape shape : shapeContainer.getShapes()) {
+			if(processShape(shape, imagesToReplace, ppt, mapper)) {
+				shapesToDelete.add(shape);
+			}
+		}
+
+		for(XSLFShape shapeToDelete : shapesToDelete) {
+			shapeContainer.removeShape(shapeToDelete);
+		}
+
+		for(ImageToReplace imageToReplace : imagesToReplace) {
+			replaceImage(ppt, shapeContainer, imageToReplace);
+		}
+	}
+
 	/**
 	 * Handles shape modification
 	 * @return true is the shape should be removed
 	 */
-	private static boolean processShape(List<ImageToReplace> imagesToReplace, XSLFShape shape, PptMapper mapper) {
+	private static boolean processShape(XSLFShape shape, List<ImageToReplace> imagesToReplace, XMLSlideShow ppt, PptMapper mapper) {
 		if(shape instanceof XSLFTextShape) {
 			return processTextShape((XSLFTextShape) shape, mapper);
 		}
@@ -101,12 +107,22 @@ public class PptTemplates {
 			return processTableShape((XSLFTable) shape, mapper);
 		}
 		if(shape instanceof XSLFPictureShape) {
-			return processImageShape(imagesToReplace, (XSLFPictureShape) shape, mapper);
+			return processImageShape((XSLFPictureShape) shape, imagesToReplace, mapper);
 		}
+		if(shape instanceof XSLFGroupShape) {
+			return processGroupShape((XSLFGroupShape) shape, ppt, mapper);
+		}
+
 		return false;
 	}
 
-	private static boolean processImageShape(List<ImageToReplace> imagesToReplace, XSLFPictureShape imageShape, PptMapper mapper) {
+	private static boolean processGroupShape(XSLFGroupShape groupShape, XMLSlideShow ppt, PptMapper mapper) {
+		processShapesContainer(groupShape, ppt, mapper);
+
+		return false;
+	}
+
+	private static boolean processImageShape(XSLFPictureShape imageShape, List<ImageToReplace> imagesToReplace, PptMapper mapper) {
 		Optional<PptVariable> imageVariable = parseHyperlinkVariable(imageShape);
 		if(shouldHide(imageVariable, mapper)) {
 			return true;
@@ -123,7 +139,7 @@ public class PptTemplates {
 		return false;
 	}
 
-	private static void replaceImage(XMLSlideShow ppt, XSLFSlide slide, ImageToReplace imageToReplace) {
+	private static void replaceImage(XMLSlideShow ppt, ShapeContainer<XSLFShape, ?> slide, ImageToReplace imageToReplace) {
 		byte[] newPictureResized = imageToReplace.imageMapper.getReplacementMode().resize(
 			imageToReplace.imageMapper.getValue(),
 			imageToReplace.imageMapper.getTargetFormat().name(),
@@ -131,7 +147,7 @@ public class PptTemplates {
 			(int) imageToReplace.toReplace.getAnchor().getHeight()
 		);
 		XSLFPictureData newPictureData = ppt.addPicture(newPictureResized, imageToReplace.imageMapper.getTargetFormat());
-		XSLFPictureShape newPictureShape = slide.createPicture(newPictureData);
+		XSLFPictureShape newPictureShape = (XSLFPictureShape) slide.createPicture(newPictureData);
 		Rectangle2D imageAnchor = imageToReplace.toReplace.getAnchor();
 
 		if(imageToReplace.imageMapper.getReplacementMode() == PptImageReplacementMode.RESIZE_CROP) {
