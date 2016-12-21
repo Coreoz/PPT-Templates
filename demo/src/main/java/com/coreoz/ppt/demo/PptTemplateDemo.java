@@ -1,4 +1,4 @@
-package com.unibail.ppt;
+package com.coreoz.ppt.demo;
 
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
