@@ -64,7 +64,7 @@ class PptParser {
 
 					break;
 				case END_VARIABLE:
-					replaceVariable(
+					indexOfChar = replaceVariable(
 						indexOfStartVariable,
 						indexOfChar,
 						mapper.textMapping(variableName.toString()),
@@ -79,10 +79,18 @@ class PptParser {
 		}
 	}
 
-	private static void replaceVariable(int indexOfStartVariable, int indexOfEndVariable,
+	/**
+	 *
+	 * @param indexOfStartVariable The index of the first char of the variable in the first TextRun
+	 * @param indexOfEndVariable The index of the last char of the variable in the last TextRun
+	 * @param replacedText The value to replace the variable
+	 * @param textParts The text parts in which the variable name should be replaced by its value
+	 * @return The index of the character in the last text part to continue to search for variable
+	 */
+	private static int replaceVariable(int indexOfStartVariable, int indexOfEndVariable,
 			Optional<String> replacedText, List<XSLFTextRun> textParts) {
 		if(!replacedText.isPresent()) {
-			return;
+			return indexOfEndVariable;
 		}
 
 		for (int i = 0; i < textParts.size(); i++) {
@@ -95,16 +103,23 @@ class PptParser {
 					textPartReplaced.append(partContent.substring(indexOfEndVariable + 1));
 				}
 				textPart.setText(textPartReplaced.toString());
+				if(textParts.size() == 1) {
+					return replacedText.get().length() - 1;
+				}
 			} else if(i < (textParts.size() - 1)) {
 				textPart.setText("");
 			} else {
 				textPart.setText(textPart.getRawText().substring(indexOfEndVariable + 1));
+				return -1;
 			}
 		}
+
+		throw new RuntimeException("Parsing issue, please report at https://github.com/Coreoz/PPT-Templates/issues");
 	}
 
 	private static State process(State before, char c) {
 		switch (before) {
+		case END_VARIABLE:
 		case INITIAL:
 			if(c == '$') {
 				return State.MAY_BE_VARIABLE;
@@ -125,7 +140,6 @@ class PptParser {
 				return State.END_VARIABLE;
 			}
 			return State.VARIABLE;
-		case END_VARIABLE:
 		}
 
 		return State.INITIAL;
