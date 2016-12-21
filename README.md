@@ -7,6 +7,7 @@ PPT Template is a small templating library to generate PowerPoint presentations.
 This project is mainly based on [POI XSLF](https://poi.apache.org/slideshow/xslf-cookbook.html).
 
 Templates are directly created in PowerPoint using a variable system.
+Templates must use the MS Office Open XML format, that means the file extension should be `.pptx`.
 
 Getting started
 ---------------
