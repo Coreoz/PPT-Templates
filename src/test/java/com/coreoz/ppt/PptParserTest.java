@@ -94,6 +94,17 @@ public class PptParserTest {
 		}
 	}
 
+	@Test
+	public void a_variable_with_an_argument_should_be_correctly_replaced() throws IOException {
+		try(XMLSlideShow ppt = new XMLSlideShow(PptParserTest.class.getResourceAsStream("/parser/variable_with_argument.pptx"))) {
+			XSLFTextParagraph paragraph = firstParagraph(ppt);
+
+			PptParser.replaceTextVariable(paragraph, new PptMapper().text("var", arg -> "Got argument : " + arg));
+
+			assertThat(paragraph.getText()).isEqualTo("Got argument : arg");
+		}
+	}
+
 	private XSLFTextParagraph firstParagraph(XMLSlideShow ppt) {
 		return ((XSLFTextShape) ppt.getSlides().get(0).getShapes().get(0)).getTextParagraphs().get(0);
 	}

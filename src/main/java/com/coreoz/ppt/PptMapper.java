@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.apache.poi.sl.usermodel.PictureData.PictureType;
@@ -50,6 +51,22 @@ public class PptMapper {
 	 */
 	public PptMapper text(String variableName, Object value) {
 		textMapping.put(variableName, PptTextMapper.of(value, null));
+		return this;
+	}
+
+	/**
+	 * Replace a text variable with a value.
+	 *
+	 * @param variableName The variable name.
+	 * It should be in the form of <code>$/variableName:'argument'/</code> in the PPT presentation
+	 * @param toValue The function that will return the value that will replace the variable.
+	 * The function take the variable argument as a parameter.
+	 * {@link Object#toString()}} will be called upon the object returned by the function.
+	 * If the Object is null, then the variable will be replaced by an empty String
+	 * @return The mapper instance
+	 */
+	public PptMapper text(String variableName, Function<String, Object> toValue) {
+		textMapping.put(variableName, PptTextMapper.of(null, toValue));
 		return this;
 	}
 
@@ -133,7 +150,9 @@ public class PptMapper {
 	 *
 	 * @param variableName The variable name.
 	 * It should be in the form of <code>$/variableName:'argument'/</code> in the PPT presentation
-	 * @param shouldHide The predicate that accepts the variable argument
+	 * @param shouldHide The predicate that accepts the variable argument ;
+	 * the predicate must return true to hide the element, if false is returned
+	 * the element remain is place and the link upon it is removed
 	 * @return The mapper instance
 	 */
 	public PptMapper hide(String variableName, Predicate<String> shouldHide) {
@@ -223,11 +242,11 @@ public class PptMapper {
 
 	// package API
 
-	Optional<String> textMapping(String variableName) {
+	Optional<String> textMapping(String variableName, String argument) {
 		return Optional
 			.ofNullable(textMapping.get(variableName))
 			.map(mapping -> mapping.getValue() == null ?
-				nullToEmpty(mapping.getSupplierToValue().get()).toString()
+				nullToEmpty(mapping.getArgumentToValue().apply(argument)).toString()
 				: nullToEmpty(mapping.getValue()).toString()
 			);
 	}

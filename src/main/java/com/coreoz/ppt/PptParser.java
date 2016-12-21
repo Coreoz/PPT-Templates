@@ -7,6 +7,8 @@ import java.util.Optional;
 import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
 import org.apache.poi.xslf.usermodel.XSLFTextRun;
 
+import lombok.AllArgsConstructor;
+
 class PptParser {
 
 	static Optional<PptVariable> parse(String text) {
@@ -27,13 +29,14 @@ class PptParser {
 		int indexOfStartVariable = -1;
 		List<XSLFTextRun> textPartsVariable = null;
 		StringBuilder variableName = null;
+		StringBuilder variableArgument = null;
 		State currentState = State.INITIAL;
 
 		for(XSLFTextRun textPart : paragraph.getTextRuns()) {
 			char[] textPartRaw = textPart.getRawText().trim().toCharArray();
 			int indexOfChar = 0;
 
-			if(currentState == State.MAY_BE_VARIABLE || currentState == State.START_VARIABLE || currentState == State.VARIABLE) {
+			if(currentState.inVariable) {
 				textPartsVariable.add(textPart);
 			}
 
@@ -46,6 +49,7 @@ class PptParser {
 						indexOfStartVariable = -1;
 						textPartsVariable = null;
 						variableName = null;
+						variableArgument = null;
 					}
 
 					break;
@@ -63,11 +67,28 @@ class PptParser {
 					variableName.append(c);
 
 					break;
+				case START_ARGUMENT_SEQUENCE:
+					break;
+
+				case START_ARGUMENT:
+					variableArgument = new StringBuilder();
+
+					break;
+				case ARGUMENT:
+					variableArgument.append(c);
+
+					break;
+				case END_ARGUMENT:
+					break;
+
 				case END_VARIABLE:
 					indexOfChar = replaceVariable(
 						indexOfStartVariable,
 						indexOfChar,
-						mapper.textMapping(variableName.toString()),
+						mapper.textMapping(
+							variableName.toString(),
+							variableArgument == null ? null : variableArgument.toString()
+						),
 						textPartsVariable
 					);
 					break;
@@ -139,19 +160,45 @@ class PptParser {
 			if(c == '/') {
 				return State.END_VARIABLE;
 			}
+			if(c == ':') {
+				return State.START_ARGUMENT_SEQUENCE;
+			}
 			return State.VARIABLE;
+		case START_ARGUMENT_SEQUENCE:
+			if(c == '\'' || c == '’') {
+				return State.START_ARGUMENT;
+			}
+			return State.START_ARGUMENT_SEQUENCE;
+		case START_ARGUMENT:
+		case ARGUMENT:
+			if(c == '\'' || c == '’') {
+				return State.END_ARGUMENT;
+			}
+			return State.ARGUMENT;
+		case END_ARGUMENT:
+			if(c == '/') {
+				return State.END_VARIABLE;
+			}
+			return State.END_ARGUMENT;
 		}
 
 		return State.INITIAL;
 	}
 
+	@AllArgsConstructor
 	private static enum State {
-		INITIAL,
-		MAY_BE_VARIABLE,
-		START_VARIABLE,
-		VARIABLE,
-		END_VARIABLE
+		INITIAL(false),
+		MAY_BE_VARIABLE(true),
+		START_VARIABLE(true),
+		VARIABLE(true),
+		START_ARGUMENT_SEQUENCE(true),
+		START_ARGUMENT(true),
+		ARGUMENT(true),
+		END_ARGUMENT(true),
+		END_VARIABLE(false)
 		;
+
+		private boolean inVariable;
 	}
 
 }
