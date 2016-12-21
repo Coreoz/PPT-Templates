@@ -18,6 +18,8 @@ import net.coobird.thumbnailator.geometry.Positions;
 
 class ImagesUtils {
 
+	private static final int QUALITY_MULTIPLICATOR = 2;
+
 	// resizing
 
 	static byte[] resizeCrop(byte[] imageData, String targetFormat, int width, int height) {
@@ -34,7 +36,7 @@ class ImagesUtils {
 		Builder<? extends InputStream> builder = Thumbnails
 			.of(new ByteArrayInputStream(imageData))
 			.outputQuality(1F)
-			.size(width, height);
+			.size(width * QUALITY_MULTIPLICATOR, height * QUALITY_MULTIPLICATOR);
 
 		if(crop) {
 			builder.crop(Positions.CENTER);
@@ -52,7 +54,10 @@ class ImagesUtils {
 	@SneakyThrows
 	static Dimension imageDimension(byte[] pictureData) {
 		BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(pictureData));
-		return new Dimension(bufferedImage.getWidth(), bufferedImage.getHeight());
+		return new Dimension(
+			bufferedImage.getWidth() / QUALITY_MULTIPLICATOR,
+			bufferedImage.getHeight() / QUALITY_MULTIPLICATOR
+		);
 	}
 
 	// image mime type
