@@ -255,6 +255,9 @@ public class PptTemplates {
 						toDelete.add(i);
 					} else {
 						textRun.setText("");
+						if(paragraph.getText().trim().isEmpty()) {
+							toDelete.add(i);
+						}
 					}
 				} else if(parsedHyperlinkVariale.isPresent()) {
 					textRun.getXmlObject().getRPr().unsetHlinkClick();
