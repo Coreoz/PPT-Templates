@@ -246,10 +246,6 @@ public class PptTemplates {
 			for (XSLFTextRun textRun : paragraph.getTextRuns()) {
 				Optional<PptVariable> parsedHyperlinkVariale = parseHyperlinkVariale(textRun.getHyperlink());
 
-				parsedHyperlinkVariale
-					.flatMap(variable -> mapper.styleText(variable.getName()))
-					.ifPresent(styler -> styler.accept(parsedHyperlinkVariale.get().getArg1(), textRun));
-
 				if(shouldHide(parsedHyperlinkVariale, mapper)) {
 					if(paragraph.getTextRuns().size() == 1) {
 						toDelete.add(i);
@@ -262,6 +258,10 @@ public class PptTemplates {
 				} else if(parsedHyperlinkVariale.isPresent()) {
 					textRun.getXmlObject().getRPr().unsetHlinkClick();
 				}
+
+				parsedHyperlinkVariale
+					.flatMap(variable -> mapper.styleText(variable.getName()))
+					.ifPresent(styler -> styler.accept(parsedHyperlinkVariale.get().getArg1(), textRun));
 			}
 
 			PptParser.replaceTextVariable(paragraph, mapper);
