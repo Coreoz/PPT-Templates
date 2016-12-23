@@ -19,7 +19,7 @@ class PptParser {
 			}
 			return Optional.of(PptVariable.of(
 				text.substring(2, indexStartParameter),
-				text.substring(indexStartParameter + 2, text.length() - 2)
+				text.substring(indexStartParameter + 1, text.length() - 1)
 			));
 		}
 		return Optional.empty();
@@ -67,9 +67,6 @@ class PptParser {
 					variableName.append(c);
 
 					break;
-				case START_ARGUMENT_SEQUENCE:
-					break;
-
 				case START_ARGUMENT:
 					variableArgument = new StringBuilder();
 
@@ -78,9 +75,6 @@ class PptParser {
 					variableArgument.append(c);
 
 					break;
-				case END_ARGUMENT:
-					break;
-
 				case END_VARIABLE:
 					indexOfChar = replaceVariable(
 						indexOfStartVariable,
@@ -161,25 +155,15 @@ class PptParser {
 				return State.END_VARIABLE;
 			}
 			if(c == ':') {
-				return State.START_ARGUMENT_SEQUENCE;
-			}
-			return State.VARIABLE;
-		case START_ARGUMENT_SEQUENCE:
-			if(c == '\'' || c == '’') {
 				return State.START_ARGUMENT;
 			}
-			return State.START_ARGUMENT_SEQUENCE;
+			return State.VARIABLE;
 		case START_ARGUMENT:
 		case ARGUMENT:
-			if(c == '\'' || c == '’') {
-				return State.END_ARGUMENT;
-			}
-			return State.ARGUMENT;
-		case END_ARGUMENT:
 			if(c == '/') {
 				return State.END_VARIABLE;
 			}
-			return State.END_ARGUMENT;
+			return State.ARGUMENT;
 		}
 
 		return State.INITIAL;
@@ -191,10 +175,8 @@ class PptParser {
 		MAY_BE_VARIABLE(true),
 		START_VARIABLE(true),
 		VARIABLE(true),
-		START_ARGUMENT_SEQUENCE(true),
 		START_ARGUMENT(true),
 		ARGUMENT(true),
-		END_ARGUMENT(true),
 		END_VARIABLE(false)
 		;
 

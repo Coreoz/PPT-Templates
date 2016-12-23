@@ -30,7 +30,7 @@ public class PptParserTest {
 
 	@Test
 	public void when_variable_with_argument_should_return_variable_name_and_its_argument() {
-		Optional<PptVariable> variable = PptParser.parse("$/variable:'arg value'/");
+		Optional<PptVariable> variable = PptParser.parse("$/variable:arg value/");
 
 		assertThat(variable).isPresent();
 		assertThat(variable.get().getName()).isEqualTo("variable");

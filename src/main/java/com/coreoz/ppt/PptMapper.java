@@ -58,7 +58,7 @@ public class PptMapper {
 	 * Replace a text variable with a value.
 	 *
 	 * @param variableName The variable name.
-	 * It should be in the form of <code>$/variableName:'argument'/</code> in the PPT presentation
+	 * It should be in the form of <code>$/variableName:argument/</code> in the PPT presentation
 	 * @param toValue The function that will return the value that will replace the variable.
 	 * The function take the variable argument as a parameter.
 	 * {@link Object#toString()}} will be called upon the object returned by the function.
@@ -77,7 +77,7 @@ public class PptMapper {
 	 * relatively to its center.
 	 *
 	 * @param variableName The variable name.
-	 * It should be in the form of <code>$/variableName:'argument'/</code> in the PPT presentation
+	 * It should be in the form of <code>$/variableName:argument/</code> in the PPT presentation
 	 * @param imageData The raw data of the image that will replace the placeholder
 	 * @return The mapper instance
 	 */
@@ -92,7 +92,7 @@ public class PptMapper {
 	 * resize the image.
 	 *
 	 * @param variableName The variable name.
-	 * It should be in the form of <code>$/variableName:'argument'/</code> in the PPT presentation
+	 * It should be in the form of <code>$/variableName:argument/</code> in the PPT presentation
 	 * @param imageData The raw data of the image that will replace the placeholder
 	 * @param replacementMode Define how the image should be resized, see {@link PptImageReplacementMode}
 	 * @return The mapper instance
@@ -119,7 +119,7 @@ public class PptMapper {
 	 * resize the image.
 	 *
 	 * @param variableName The variable name.
-	 * It should be in the form of <code>$/variableName:'argument'/</code> in the PPT presentation
+	 * It should be in the form of <code>$/variableName:argument/</code> in the PPT presentation
 	 * @param imageData The raw data of the image that will replace the placeholder
 	 * @param replacementMode Define how the image should be resized, see {@link PptImageReplacementMode}
 	 * @param imageFormat specify the picture format that will be used in the PPT ;
@@ -137,7 +137,7 @@ public class PptMapper {
 	 * based on a variable placed in the link of the element.
 	 *
 	 * @param variableName The variable name.
-	 * It should be in the form of <code>$/variableName:'argument'/</code> in the PPT presentation
+	 * It should be in the form of <code>$/variableName:argument/</code> in the PPT presentation
 	 * @return The mapper instance
 	 */
 	public PptMapper hide(String variableName) {
@@ -149,7 +149,7 @@ public class PptMapper {
 	 * based on a variable placed in the link of the element.
 	 *
 	 * @param variableName The variable name.
-	 * It should be in the form of <code>$/variableName:'argument'/</code> in the PPT presentation
+	 * It should be in the form of <code>$/variableName:argument/</code> in the PPT presentation
 	 * @param shouldHide The predicate that accepts the variable argument ;
 	 * the predicate must return true to hide the element, if false is returned
 	 * the element remain is place and the link upon it is removed
@@ -166,7 +166,7 @@ public class PptMapper {
 	 * The text object is identified with a link placed on it.
 	 *
 	 * @param variableName The variable name.
-	 * It should be in the form of <code>$/variableName:'argument'/</code> in the PPT presentation
+	 * It should be in the form of <code>$/variableName:argument/</code> in the PPT presentation
 	 * @param applyText The consumer that will directly change the {@link TextRun}
 	 * @return The mapper instance
 	 */
@@ -180,7 +180,7 @@ public class PptMapper {
 	 * The text object is identified with a link placed on it.
 	 *
 	 * @param variableName The variable name.
-	 * It should be in the form of <code>$/variableName:'argument'/</code> in the PPT presentation
+	 * It should be in the form of <code>$/variableName:argument/</code> in the PPT presentation
 	 * @param applyText The bi consumer that will directly change the {@link TextRun},
 	 * the first consumer parameter is the variable argument
 	 * @return The mapper instance
@@ -196,7 +196,7 @@ public class PptMapper {
 	 * The shape object is identified with a link placed on it.
 	 *
 	 * @param variableName The variable name.
-	 * It should be in the form of <code>$/variableName:'argument'/</code> in the PPT presentation
+	 * It should be in the form of <code>$/variableName:argument/</code> in the PPT presentation
 	 * @param applyShape The consumer that will directly change the {@link XSLFSimpleShape}
 	 * @return The mapper instance
 	 */
@@ -210,7 +210,7 @@ public class PptMapper {
 	 * The shape object is identified with a link placed on it.
 	 *
 	 * @param variableName The variable name.
-	 * It should be in the form of <code>$/variableName:'argument'/</code> in the PPT presentation
+	 * It should be in the form of <code>$/variableName:argument/</code> in the PPT presentation
 	 * @param applyShape The bi consumer that will directly change the {@link XSLFSimpleShape},
 	 * the first consumer parameter is the variable argument
 	 * @return The mapper instance
