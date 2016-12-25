@@ -2,8 +2,7 @@ package com.coreoz.ppt;
 
 import java.util.Optional;
 
-import com.coreoz.ppt.patternMatcher.characterHandler.AbstractCharacterHandler;
-import com.coreoz.ppt.patternMatcher.characterHandler.FirstCharacter;
+import com.coreoz.ppt.patternMatcher.PatternMatcher;
 import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
 import org.apache.poi.xslf.usermodel.XSLFTextRun;
 
@@ -24,27 +23,23 @@ class PptParser {
 	}
 
 	static void replaceTextVariable(XSLFTextParagraph paragraph, PptMapper mapper) {
-		AbstractCharacterHandler currentHandler = new FirstCharacter(mapper);
+		PatternMatcher patternMatcher = new PatternMatcher(mapper);
 
 		for(XSLFTextRun textPart : paragraph.getTextRuns()) {
 
-			currentHandler.registerTextPart(textPart);
+			patternMatcher.registerTextPart(textPart);
 
-			currentHandler = handleTextPart(currentHandler, textPart);
+			handleTextPart(patternMatcher, textPart);
 		}
 	}
 
-	private static AbstractCharacterHandler handleTextPart(AbstractCharacterHandler currentHandler, XSLFTextRun textPart) {
+	protected static void handleTextPart(PatternMatcher patternMatcher, XSLFTextRun textPart) {
 		char[] textPartRaw = textPart.getRawText().trim().toCharArray();
 		int indexOfChar = 0;
-		AbstractCharacterHandler nextHandler = currentHandler;
 
 		for(char c : textPartRaw) {
-            nextHandler = nextHandler.getNextHandler(c);
-
-            nextHandler.processCharacter(c, indexOfChar++, textPart);
+			patternMatcher.processCharacter(c, indexOfChar++, textPart);
         }
-		return nextHandler;
 	}
 
 }
