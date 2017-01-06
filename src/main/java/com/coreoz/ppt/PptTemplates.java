@@ -159,33 +159,42 @@ public class PptTemplates {
 			imageToReplace.imageMapper.getReplacementMode()
 		);
 
-		// If the container is a slide, we can use the old image element,
-		// keep all its properties (among the z-index), and just update its relation
-		// to point to the new picture data
 		if(shapeContainer instanceof POIXMLDocumentPart) {
-			POIXMLDocumentPart containerDocument = ((POIXMLDocumentPart) shapeContainer);
-
-			RelationPart rp = containerDocument.addRelation(null, XSLFRelation.IMAGES, newPictureData);
-			CTPicture pictureXml = (CTPicture) imageToReplace.toReplace.getXmlObject();
-			CTBlip pictureBlip = pictureXml.getBlipFill().getBlip();
-
-			// clean up the old picture data
-			PptPoiBridge.removeRelation(containerDocument, containerDocument.getRelationById(pictureBlip.getEmbed()));
-
-			pictureBlip.setEmbed(rp.getRelationship().getId());
-
-			imageToReplace.toReplace.setAnchor(newImageAnchor);
+			replaceImageInPlace((POIXMLDocumentPart) shapeContainer, imageToReplace, newPictureData, newImageAnchor);
 		}
-		// If the container is something else, like a group of elements,
-		// it is working another way and I don't have the time to investigate :)
-		// Anyway, this fall back should work, the only problem
-		// is that the old image properties won't be kept
+		else if(shapeContainer instanceof XSLFGroupShape) {
+			replaceImageInPlace(((XSLFGroupShape) shapeContainer).getSheet(), imageToReplace, newPictureData, newImageAnchor);
+		}
+		// If the container is not a POIXMLDocumentPart or a XSLFGroupShape,
+		// the old image have to deleted along with its properties.
+		// The new image will just be place in the same area of the old image.
+		// This behavior is a fall back that should not append since
+		// I don't think the image container can be something else
+		// apart from POIXMLDocumentPart and XSLFGroupShape.
 		else {
 			XSLFPictureShape newPictureShape = (XSLFPictureShape) shapeContainer.createPicture(newPictureData);
 			newPictureShape.setAnchor(newImageAnchor);
 
 			shapeContainer.removeShape(imageToReplace.toReplace);
 		}
+	}
+
+	/**
+	 * Replace an image with another while keeping
+	 * all the properties of the old image: z-index, border, shadow...
+	 */
+	private static void replaceImageInPlace(POIXMLDocumentPart containerDocument, ImageToReplace imageToReplace,
+			XSLFPictureData newPictureData, Rectangle2D newImageAnchor) {
+		RelationPart rp = containerDocument.addRelation(null, XSLFRelation.IMAGES, newPictureData);
+		CTPicture pictureXml = (CTPicture) imageToReplace.toReplace.getXmlObject();
+		CTBlip pictureBlip = pictureXml.getBlipFill().getBlip();
+
+		// clean up the old picture data
+		PptPoiBridge.removeRelation(containerDocument, containerDocument.getRelationById(pictureBlip.getEmbed()));
+
+		pictureBlip.setEmbed(rp.getRelationship().getId());
+
+		imageToReplace.toReplace.setAnchor(newImageAnchor);
 	}
 
 	private static Rectangle2D computeNewImageAnchor(Rectangle2D imageAnchor,
