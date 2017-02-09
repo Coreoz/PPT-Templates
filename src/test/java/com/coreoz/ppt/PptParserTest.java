@@ -107,7 +107,7 @@ public class PptParserTest {
 
 	@Test
 	public void space_with_content_before_variable_should_not_be_erased() throws IOException {
-		try(XMLSlideShow ppt = new XMLSlideShow(PptParserTest.class.getResourceAsStream("/parser/space_with_content_before_variable"))) {
+		try(XMLSlideShow ppt = new XMLSlideShow(PptParserTest.class.getResourceAsStream("/parser/space_with_content_before_variable.pptx"))) {
 			XSLFTextParagraph paragraph = firstParagraph(ppt);
 
 			PptParser.replaceTextVariable(paragraph, new PptMapper().text("var", "value"));
