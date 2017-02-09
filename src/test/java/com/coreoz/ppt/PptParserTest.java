@@ -105,6 +105,17 @@ public class PptParserTest {
 		}
 	}
 
+	@Test
+	public void space_with_content_before_variable_should_not_be_erased() throws IOException {
+		try(XMLSlideShow ppt = new XMLSlideShow(PptParserTest.class.getResourceAsStream("/parser/space_with_content_before_variable"))) {
+			XSLFTextParagraph paragraph = firstParagraph(ppt);
+
+			PptParser.replaceTextVariable(paragraph, new PptMapper().text("var", "value"));
+
+			assertThat(paragraph.getText()).isEqualTo("Some content: (value)");
+		}
+	}
+
 	private XSLFTextParagraph firstParagraph(XMLSlideShow ppt) {
 		return ((XSLFTextShape) ppt.getSlides().get(0).getShapes().get(0)).getTextParagraphs().get(0);
 	}

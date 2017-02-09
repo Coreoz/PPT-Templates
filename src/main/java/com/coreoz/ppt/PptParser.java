@@ -33,7 +33,7 @@ class PptParser {
 		State currentState = State.INITIAL;
 
 		for(XSLFTextRun textPart : paragraph.getTextRuns()) {
-			char[] textPartRaw = textPart.getRawText().trim().toCharArray();
+			char[] textPartRaw = textPart.getRawText().toCharArray();
 			int indexOfChar = 0;
 
 			if(currentState.inVariable) {
