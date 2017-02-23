@@ -189,12 +189,40 @@ public class PptTemplates {
 		CTPicture pictureXml = (CTPicture) imageToReplace.toReplace.getXmlObject();
 		CTBlip pictureBlip = pictureXml.getBlipFill().getBlip();
 
-		// clean up the old picture data
-		PptPoiBridge.removeRelation(containerDocument, containerDocument.getRelationById(pictureBlip.getEmbed()));
+		String relationId = pictureBlip.getEmbed();
+		if(canRelationBeRemoved(containerDocument, relationId)) {
+			// clean up the old picture data
+			PptPoiBridge.removeRelation(containerDocument, containerDocument.getRelationById(relationId));
+		}
 
 		pictureBlip.setEmbed(rp.getRelationship().getId());
 
 		imageToReplace.toReplace.setAnchor(newImageAnchor);
+	}
+
+	private static boolean canRelationBeRemoved(POIXMLDocumentPart containerDocument, String relationId) {
+		XSLFSlide currentSlide = findCurrentSlide(containerDocument);
+		if(currentSlide == null) {
+			// this case where a containerDocument in not part of a slide should not append,
+			// but in doubt we don't allow relation to be changed here
+			return false;
+		}
+
+		return StringUtils.countMatches(currentSlide.getXmlObject().toString(), "r:embed=\""+relationId+"\"") < 2;
+	}
+
+	private static XSLFSlide findCurrentSlide(POIXMLDocumentPart containerDocument) {
+		while(containerDocument != null) {
+			if(containerDocument instanceof XSLFSlide) {
+				return (XSLFSlide) containerDocument;
+			}
+			if(containerDocument instanceof XMLSlideShow) {
+				return null;
+			}
+
+			containerDocument = containerDocument.getParent();
+		}
+		return null;
 	}
 
 	private static Rectangle2D computeNewImageAnchor(Rectangle2D imageAnchor,
