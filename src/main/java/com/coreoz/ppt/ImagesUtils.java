@@ -4,11 +4,14 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
 import org.apache.poi.sl.usermodel.PictureData.PictureType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -17,6 +20,8 @@ import net.coobird.thumbnailator.Thumbnails.Builder;
 import net.coobird.thumbnailator.geometry.Positions;
 
 class ImagesUtils {
+
+	private static final Logger logger = LoggerFactory.getLogger(ImagesUtils.class);
 
 	private static final int QUALITY_MULTIPLICATOR = 2;
 
@@ -42,9 +47,14 @@ class ImagesUtils {
 			builder.crop(Positions.CENTER);
 		}
 
-		builder
-			.outputFormat(targetFormat)
-			.toOutputStream(byteArrayOutputStream);
+		try {
+			builder
+				.outputFormat(targetFormat)
+				.toOutputStream(byteArrayOutputStream);
+		} catch (IOException e) {
+			logger.error("Cannot resize image to format {}", targetFormat, e);
+			return null;
+		}
 
 		return byteArrayOutputStream.toByteArray();
 	}

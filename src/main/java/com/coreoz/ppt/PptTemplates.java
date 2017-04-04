@@ -152,6 +152,11 @@ public class PptTemplates {
 			(int) imageToReplace.toReplace.getAnchor().getWidth(),
 			(int) imageToReplace.toReplace.getAnchor().getHeight()
 		);
+		if(newPictureResized == null) {
+			// if an error occurred during the resizement of the image, the replacement cannot be processed
+			return;
+		}
+
 		XSLFPictureData newPictureData = ppt.addPicture(newPictureResized, imageToReplace.imageMapper.getTargetFormat());
 		Rectangle2D newImageAnchor = computeNewImageAnchor(
 			imageToReplace.toReplace.getAnchor(),
