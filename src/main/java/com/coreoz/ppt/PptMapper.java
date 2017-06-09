@@ -128,7 +128,41 @@ public class PptMapper {
 	 */
 	public PptMapper image(String variableName, byte[] imageData,
 			PptImageReplacementMode replacementMode, PictureType imageFormat) {
-		imageMapping.put(variableName, PptImageMapper.of(imageFormat, replacementMode, imageData));
+		return image(
+			variableName,
+			imageData,
+			replacementMode,
+			imageFormat,
+			PptImageMapper.DEFAULT_QUALITY_FACTOR,
+			PptImageMapper.DEFAULT_QUALITY_MULTIPLICATOR
+		);
+	}
+
+	/**
+	 * Replace an image placeholder by an other image.
+	 * This image placeholder is identified with a link placed on it.
+	 * To fit the placeholder, the replacement mode will be used to
+	 * resize the image.
+	 *
+	 * @param variableName The variable name.
+	 * It should be in the form of <code>$/variableName:argument/</code> in the PPT presentation
+	 * @param imageData The raw data of the image that will replace the placeholder
+	 * @param replacementMode Define how the image should be resized, see {@link PptImageReplacementMode}
+	 * @param imageFormat specify the picture format that will be used in the PPT ;
+	 * note that this format may differ from the original format of the replacement image
+	 * @param qualityFactor The target picture quality between 0 (low quality) and 1 (high quality)
+	 * @param qualityMultiplicator Another picture quality parameter between 0 (the image will not be shown),
+	 * 1 (the image will be sized to fit exactly its placeholder), N (the image will be resized to fit its placeholder size times N)
+	 * @return The mapper instance
+	 */
+	public PptMapper image(String variableName, byte[] imageData,
+			PptImageReplacementMode replacementMode, PictureType imageFormat,
+			float qualityFactor,
+			double qualityMultiplicator) {
+		imageMapping.put(
+			variableName,
+			PptImageMapper.of(imageFormat, replacementMode, imageData, qualityFactor, qualityMultiplicator)
+		);
 		return this;
 	}
 

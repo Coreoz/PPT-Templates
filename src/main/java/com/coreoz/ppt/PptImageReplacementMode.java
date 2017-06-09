@@ -24,13 +24,21 @@ public enum PptImageReplacementMode {
 
 	private final ResizeFunction resizeFunction;
 
-	byte[] resize(byte[] imageData, String targetFormat, int width, int height) {
-		return resizeFunction.resizeImage(imageData, targetFormat, width, height);
+	byte[] resize(byte[] imageData, String targetFormat, int width, int height,
+			float qualityFactor, double qualityMultiplicator) {
+		return resizeFunction.resizeImage(imageData, targetFormat, width, height, qualityFactor, qualityMultiplicator);
 	}
 
 	@FunctionalInterface
 	private static interface ResizeFunction {
-		byte[] resizeImage(byte[] imageData, String targetFormat, int width, int height);
+		byte[] resizeImage(
+			byte[] imageData,
+			String targetFormat,
+			int width,
+			int height,
+			float qualityFactor,
+			double qualityMultiplicator
+		);
 	}
 
 }

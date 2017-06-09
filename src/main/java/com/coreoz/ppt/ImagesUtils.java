@@ -19,29 +19,33 @@ import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.Thumbnails.Builder;
 import net.coobird.thumbnailator.geometry.Positions;
 
-class ImagesUtils {
+public class ImagesUtils {
 
 	private static final Logger logger = LoggerFactory.getLogger(ImagesUtils.class);
 
-	private static final int QUALITY_MULTIPLICATOR = 2;
-
 	// resizing
 
-	static byte[] resizeCrop(byte[] imageData, String targetFormat, int width, int height) {
-		return resize(imageData, targetFormat, width, height, true);
+	static byte[] resizeCrop(byte[] imageData, String targetFormat, int width, int height,
+			float qualityFactor, double qualityMultiplicator) {
+		return resize(imageData, targetFormat, width, height, true, qualityFactor, qualityMultiplicator);
 	}
 
-	static byte[] resizeOnly(byte[] imageData, String targetFormat, int width, int height) {
-		return resize(imageData, targetFormat, width, height, false);
+	static byte[] resizeOnly(byte[] imageData, String targetFormat, int width, int height,
+			float qualityFactor, double qualityMultiplicator) {
+		return resize(imageData, targetFormat, width, height, false, qualityFactor, qualityMultiplicator);
 	}
 
 	@SneakyThrows
-	private static byte[] resize(byte[] imageData, String targetFormat, int width, int height, boolean crop) {
+	private static byte[] resize(byte[] imageData, String targetFormat, int width, int height,
+			boolean crop, float qualityFactor, double qualityMultiplicator) {
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		Builder<? extends InputStream> builder = Thumbnails
 			.of(new ByteArrayInputStream(imageData))
-			.outputQuality(1F)
-			.size(width * QUALITY_MULTIPLICATOR, height * QUALITY_MULTIPLICATOR);
+			.outputQuality(qualityFactor)
+			.size(
+				(int) Math.round(width * qualityMultiplicator),
+				(int) Math.round(height * qualityMultiplicator)
+			);
 
 		if(crop) {
 			builder.crop(Positions.CENTER);
@@ -62,17 +66,17 @@ class ImagesUtils {
 	// image size
 
 	@SneakyThrows
-	static Dimension imageDimension(byte[] pictureData) {
+	static Dimension imageDimension(byte[] pictureData, double qualityMultiplicator) {
 		BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(pictureData));
 		return new Dimension(
-			bufferedImage.getWidth() / QUALITY_MULTIPLICATOR,
-			bufferedImage.getHeight() / QUALITY_MULTIPLICATOR
+			(int) Math.round(bufferedImage.getWidth() / qualityMultiplicator),
+			(int) Math.round(bufferedImage.getHeight() / qualityMultiplicator)
 		);
 	}
 
 	// image mime type
 
-	static PictureType guessPictureType(byte[] pictureData) {
+	public static PictureType guessPictureType(byte[] pictureData) {
 		for(ImageType imageType : ImageType.values()) {
 			if(startsWith(pictureData, imageType.startPattern)) {
 				return imageType.poiType;

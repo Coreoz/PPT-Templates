@@ -150,7 +150,9 @@ public class PptTemplates {
 			imageToReplace.imageMapper.getValue(),
 			imageToReplace.imageMapper.getTargetFormat().name(),
 			(int) imageToReplace.toReplace.getAnchor().getWidth(),
-			(int) imageToReplace.toReplace.getAnchor().getHeight()
+			(int) imageToReplace.toReplace.getAnchor().getHeight(),
+			imageToReplace.getImageMapper().getQualityFactory(),
+			imageToReplace.getImageMapper().getQualityMultiplicator()
 		);
 		if(newPictureResized == null) {
 			// if an error occurred during the resizement of the image, the replacement cannot be processed
@@ -161,7 +163,8 @@ public class PptTemplates {
 		Rectangle2D newImageAnchor = computeNewImageAnchor(
 			imageToReplace.toReplace.getAnchor(),
 			newPictureResized,
-			imageToReplace.imageMapper.getReplacementMode()
+			imageToReplace.imageMapper.getReplacementMode(),
+			imageToReplace.imageMapper.getQualityMultiplicator()
 		);
 
 		if(shapeContainer instanceof POIXMLDocumentPart) {
@@ -230,13 +233,13 @@ public class PptTemplates {
 		return null;
 	}
 
-	private static Rectangle2D computeNewImageAnchor(Rectangle2D imageAnchor,
-			byte[] newPictureResized,PptImageReplacementMode replacementMode) {
+	private static Rectangle2D computeNewImageAnchor(Rectangle2D imageAnchor, byte[] newPictureResized,
+			PptImageReplacementMode replacementMode, double qualityMultiplicator) {
 		if(replacementMode == PptImageReplacementMode.RESIZE_CROP) {
 			return imageAnchor;
 		}
 
-		Dimension newImageSize = ImagesUtils.imageDimension(newPictureResized);
+		Dimension newImageSize = ImagesUtils.imageDimension(newPictureResized, qualityMultiplicator);
 		return new Rectangle2D.Double(
 			imageAnchor.getX(),
 			imageAnchor.getY(),
