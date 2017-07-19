@@ -22,6 +22,7 @@ import org.apache.poi.xslf.usermodel.XSLFRelation;
 import org.apache.poi.xslf.usermodel.XSLFShape;
 import org.apache.poi.xslf.usermodel.XSLFSimpleShape;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
+import org.apache.poi.xslf.usermodel.XSLFSlideMaster;
 import org.apache.poi.xslf.usermodel.XSLFTable;
 import org.apache.poi.xslf.usermodel.XSLFTableCell;
 import org.apache.poi.xslf.usermodel.XSLFTableRow;
@@ -74,6 +75,9 @@ public class PptTemplates {
 	 */
 	public static XMLSlideShow processPpt(XMLSlideShow ppt, PptMapper mapper) {
 		for(XSLFSlide slide : ppt.getSlides()) {
+			processShapesContainer(slide, ppt, mapper);
+		}
+		for(XSLFSlideMaster slide : ppt.getSlideMasters()) {
 			processShapesContainer(slide, ppt, mapper);
 		}
 
