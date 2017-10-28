@@ -3,3 +3,5 @@
 /.classpath
 /.project
 /full_content_transformed.pptx
+/.apt_generated/
+/.factorypath

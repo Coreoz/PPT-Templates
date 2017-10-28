@@ -305,7 +305,7 @@ public class PptTemplates {
 						}
 					}
 				} else if(parsedHyperlinkVariale.isPresent()) {
-					textRun.getXmlObject().getRPr().unsetHlinkClick();
+					PptPoiBridge.removeHyperlink(textRun);
 				}
 
 				parsedHyperlinkVariale
