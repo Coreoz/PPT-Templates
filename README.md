@@ -16,7 +16,7 @@ Include PPT Templates in your project:
 <dependency>
     <groupId>com.coreoz</groupId>
     <artifactId>ppt-templates</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
