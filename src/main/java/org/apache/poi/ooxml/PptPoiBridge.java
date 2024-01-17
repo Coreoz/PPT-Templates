@@ -1,4 +1,4 @@
-package org.apache.poi;
+package org.apache.poi.ooxml;
 
 import org.apache.poi.xslf.usermodel.XSLFTextRun;
 import org.apache.xmlbeans.XmlObject;

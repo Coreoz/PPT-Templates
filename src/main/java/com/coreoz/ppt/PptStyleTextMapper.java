@@ -1,14 +1,11 @@
 package com.coreoz.ppt;
 
-import java.util.function.BiConsumer;
-
+import lombok.Value;
 import org.apache.poi.sl.usermodel.TextRun;
 
-import lombok.Value;
+import java.util.function.BiConsumer;
 
 @Value(staticConstructor = "of")
 class PptStyleTextMapper {
-
-	private final BiConsumer<String, TextRun> applyStyle;
-
+	BiConsumer<String, TextRun> applyStyle;
 }

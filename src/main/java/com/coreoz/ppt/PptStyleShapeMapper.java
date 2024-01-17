@@ -8,7 +8,5 @@ import lombok.Value;
 
 @Value(staticConstructor = "of")
 class PptStyleShapeMapper {
-
-	private final BiConsumer<String, XSLFSimpleShape> applyStyle;
-
+	BiConsumer<String, XSLFSimpleShape> applyStyle;
 }
