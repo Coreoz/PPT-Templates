@@ -365,8 +365,8 @@ public class PptTemplates {
 
 	@Value(staticConstructor = "of")
 	private static class ImageToReplace {
-		private final XSLFPictureShape toReplace;
-		private final PptImageMapper imageMapper;
+		XSLFPictureShape toReplace;
+		PptImageMapper imageMapper;
 	}
 
 }

@@ -29,12 +29,28 @@ public class PptMapper {
 	private final Map<String, PptStyleTextMapper> styleTextMapping;
 	private final Map<String, PptStyleShapeMapper> styleShapeMapping;
 
+	private char variableCharDelimiter;
+	private char variableCharStart;
+
 	public PptMapper() {
+		this.variableCharDelimiter = '/';
+		this.variableCharStart = '$';
+
 		this.textMapping = new HashMap<>();
 		this.imageMapping = new HashMap<>();
 		this.hideMapping = new HashMap<>();
 		this.styleTextMapping = new HashMap<>();
 		this.styleShapeMapping = new HashMap<>();
+	}
+
+	public PptMapper setVariableCharDelimiter(char variableCharDelimiter) {
+		this.variableCharDelimiter = variableCharDelimiter;
+		return this;
+	}
+
+	public PptMapper setVariableCharStart(char variableCharStart) {
+		this.variableCharStart = variableCharStart;
+		return this;
 	}
 
 	// configuration
