@@ -30,7 +30,7 @@ public enum PptImageReplacementMode {
 	}
 
 	@FunctionalInterface
-	private static interface ResizeFunction {
+	private interface ResizeFunction {
 		byte[] resizeImage(
 			byte[] imageData,
 			String targetFormat,

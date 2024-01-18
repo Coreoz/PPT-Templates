@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import org.apache.poi.POIXMLDocumentPart;
-import org.apache.poi.POIXMLDocumentPart.RelationPart;
-import org.apache.poi.PptPoiBridge;
+import org.apache.poi.ooxml.POIXMLDocumentPart;
+import org.apache.poi.ooxml.POIXMLDocumentPart.RelationPart;
+import org.apache.poi.ooxml.PptPoiBridge;
 import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.sl.usermodel.Hyperlink;
 import org.apache.poi.sl.usermodel.ShapeContainer;
@@ -357,7 +357,7 @@ public class PptTemplates {
 
 
 	private static Optional<PptVariable> parseHyperlinkVariale(Hyperlink<?, ?> link) {
-		if(link != null && link.getTypeEnum() == HyperlinkType.URL) {
+		if(link != null && link.getType() == HyperlinkType.URL) {
 			return PptParser.parse(link.getAddress());
 		}
 		return Optional.empty();

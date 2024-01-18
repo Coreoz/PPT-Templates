@@ -5,3 +5,7 @@
 /full_content_transformed.pptx
 /.apt_generated/
 /.factorypath
+
+# IntelliJ
+/.idea
+*.iml

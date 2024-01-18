@@ -170,7 +170,7 @@ class PptParser {
 	}
 
 	@AllArgsConstructor
-	private static enum State {
+	private enum State {
 		INITIAL(false),
 		MAY_BE_VARIABLE(true),
 		START_VARIABLE(true),
@@ -180,7 +180,7 @@ class PptParser {
 		END_VARIABLE(false)
 		;
 
-		private boolean inVariable;
+		private final boolean inVariable;
 	}
 
 }
