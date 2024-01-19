@@ -1,7 +1,7 @@
 PPT Templates
 =============
 
-[![Build Status](https://travis-ci.org/Coreoz/PPT-Templates.svg?branch=master)](https://travis-ci.org/Coreoz/PPT-Templates)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Coreoz_PPT-Templates&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Coreoz_PPT-Templates)
 
 PPT Template is a small templating library to generate PowerPoint presentations.
 This project is mainly based on [POI XSLF](https://poi.apache.org/slideshow/xslf-cookbook.html).
